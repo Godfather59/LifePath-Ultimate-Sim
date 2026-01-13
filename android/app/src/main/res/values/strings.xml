@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">BitLifeClone</string>
+    <string name="title_activity_main">BitLifeClone</string>
+    <string name="package_name">com.example.bitlifeclone</string>
+    <string name="custom_url_scheme">com.example.bitlifeclone</string>
+</resources>

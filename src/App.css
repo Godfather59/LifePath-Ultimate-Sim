@@ -1,0 +1,25 @@
+/* Main App Container */
+#root {
+  /* We handle root dimensions in index.css global, but here we can add specific desktop refinements */
+  border-radius: 30px;
+  /* Phone-like corners */
+}
+
+/* Desktop Polish: If screen is large, make it look like a floating device */
+@media (min-width: 600px) {
+  #root {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    border: 8px solid #000;
+  }
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0;
+  color: #fff;
+  overflow: hidden;
+  /* Ensure nothing breaks out */
+}

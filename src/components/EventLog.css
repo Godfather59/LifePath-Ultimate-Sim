@@ -1,0 +1,84 @@
+.event-log {
+    /* Absolute Positioning to fill the screen behind HUD/Menu */
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    /* Scroll Behavior */
+    overflow-y: scroll;
+    /* Force scroll capability */
+    -webkit-overflow-scrolling: touch;
+    /* Smooth scroll on iOS */
+
+    /* Spacing for Fixed Elements */
+    padding-top: 240px;
+    padding-bottom: 400px;
+    padding-left: 16px;
+    padding-right: 16px;
+
+    /* Box Model Safety */
+    width: 100%;
+    box-sizing: border-box;
+    z-index: 1;
+    /* Below HUD (50) and Menu (50) */
+}
+
+.event-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 10px;
+    border-left: 4px solid #888;
+    position: relative;
+    text-align: left;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.event-age-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 0.7rem;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--text-secondary);
+}
+
+.event-text {
+    font-size: 0.95rem;
+    line-height: 1.4;
+    padding-right: 30px;
+    /* Ensure text doesn't hit the age badge */
+    word-break: break-word;
+    /* Prevent long words from overflowing */
+}
+
+/* Event Types */
+.type-good {
+    border-left-color: var(--success-color);
+    background: linear-gradient(90deg, rgba(0, 176, 155, 0.1), transparent);
+}
+
+.type-bad {
+    border-left-color: var(--danger-color);
+    background: linear-gradient(90deg, rgba(255, 65, 108, 0.1), transparent);
+}
+
+.type-neutral {
+    border-left-color: var(--text-secondary);
+}

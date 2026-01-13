@@ -1,0 +1,91 @@
+.action-menu-container {
+    background: rgba(18, 18, 28, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--glass-border);
+
+    /* Fixed Positioning */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 50;
+
+    padding: 16px;
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+    display: flex;
+    flex-direction: column;
+}
+
+.age-up-btn {
+    background: var(--accent-secondary);
+    background: linear-gradient(135deg, var(--accent-seconday) 0%, var(--accent-primary) 100%);
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 800;
+    padding: 20px;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 4px 15px rgba(142, 45, 226, 0.4);
+    margin-bottom: 24px;
+    width: 100%;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: transform 0.1s, box-shadow 0.2s;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.age-up-btn:active {
+    transform: scale(0.98);
+}
+
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.action-card {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+    backdrop-filter: blur(8px);
+}
+
+.action-card:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.action-card:active {
+    transform: scale(0.95);
+}
+
+.action-icon {
+    font-size: 2rem;
+    margin-bottom: 8px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.action-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+.section-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
