@@ -1,4 +1,4 @@
-# Life Simulator (BitLife Clone)
+# Life Simulator
 
 A text-based life simulator game built with React, Vite, and Capacitor for Android.
 
