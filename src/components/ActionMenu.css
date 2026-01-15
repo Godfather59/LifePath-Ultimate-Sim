@@ -1,3 +1,25 @@
+/* Main Action Menu Container */
+.action-menu {
+    background: rgba(18, 18, 28, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--glass-border);
+
+    /* Fixed Positioning */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 50;
+
+    padding: 16px;
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+    display: flex;
+    flex-direction: column;
+}
+
+/* Fallback for old class name */
 .action-menu-container {
     background: rgba(18, 18, 28, 0.95);
     backdrop-filter: blur(16px);
@@ -39,11 +61,47 @@
     transform: scale(0.98);
 }
 
+/* Action Button Grid */
+.action-menu-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+/* Fallback for old class name */
 .actions-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;
     margin-bottom: 20px;
+}
+
+/* Individual Action Button */
+.action-btn {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+    backdrop-filter: blur(8px);
+    padding: 12px;
+    cursor: pointer;
+}
+
+.action-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.action-btn:active {
+    transform: scale(0.95);
 }
 
 .action-card {

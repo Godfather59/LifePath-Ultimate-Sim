@@ -721,6 +721,54 @@ export const CAREER_EVENTS = [
             { text: 'Deny it', effects: { karma: -10, smarts: -2 }, outcomeText: 'The lie made it worse.', type: 'bad' }
         ]
     },
+    {
+        id: 'pol_taxes',
+        trigger: (person) => person.job && person.job.title === 'President' && Math.random() < 0.2,
+        text: 'The Congress is debating a major tax reform. They want your signature.',
+        choices: [
+            { text: 'Lower Taxes', effects: { happiness: 15, money: 50000 }, outcomeText: 'The middle class is happy, but the budget deficit grew.', type: 'good' },
+            { text: 'Tax the Rich', effects: { happiness: 10, karma: 10 }, outcomeText: 'Public services boosted. Your billionaire donors are furious.', type: 'mixed' },
+            { text: 'Veto Bill', effects: { stress: 10 }, outcomeText: 'Political gridlock continues. You look strong but unproductive.', type: 'neutral' }
+        ]
+    },
+    {
+        id: 'pol_infra',
+        trigger: (person) => person.job && person.job.isPolitical && Math.random() < 0.15,
+        text: 'A proposal for a high-speed rail network is on your desk.',
+        choices: [
+            { text: 'Build it', effects: { smarts: 5, happiness: 10 }, outcomeText: 'A technological marvel! Your legacy is secured.', type: 'good' },
+            { text: 'Budget cuts', effects: { money: 100000, happiness: -5 }, outcomeText: 'Saved money, but the roads are crumbling.', type: 'mixed' }
+        ]
+    },
+    {
+        id: 'pol_state_visit',
+        trigger: (person) => person.job && person.job.title === 'President' && Math.random() < 0.1,
+        text: 'The leader of a powerful allied nation is visiting for a summit.',
+        choices: [
+            { text: 'Lavish Gala', effects: { fame: 10, money: -20000 }, outcomeText: 'The world watched in awe. Diplomacy at its finest.', type: 'good' },
+            { text: 'Business only', effects: { smarts: 3 }, outcomeText: 'A productive meeting. No fluff.', type: 'neutral' }
+        ]
+    },
+    {
+        id: 'pol_reform',
+        trigger: (person) => person.job && person.job.isPolitical && Math.random() < 0.1,
+        text: 'Activists are marching for major healthcare reform.',
+        choices: [
+            { text: 'Universal Care', effects: { karma: 20, health: 10, happiness: 20 }, outcomeText: 'A historic move! You\'ve changed millions of lives.', type: 'good' },
+            { text: 'Private system', effects: { money: 200000 }, outcomeText: 'The stock market loved it. The people... not so much.', type: 'mixed' },
+            { text: 'Do nothing', effects: { happiness: -15 }, outcomeText: 'Protests intensified. You look out of touch.', type: 'bad' }
+        ]
+    },
+    {
+        id: 'pol_crisis',
+        trigger: (person) => person.job && person.job.title === 'President' && Math.random() < 0.05,
+        text: 'The stock market has crashed 20% in a single day.',
+        choices: [
+            { text: 'Bailouts', effects: { money: -500000, stress: 30 }, outcomeText: 'The banks survived. The taxpayers are angry.', type: 'mixed' },
+            { text: 'Austerity', effects: { happiness: -20, money: 100000 }, outcomeText: 'National debt down, unemployment up.', type: 'bad' },
+            { text: 'Stimulus', effects: { happiness: 10, money: -200000 }, outcomeText: 'The economy is slowly recovering.', type: 'good' }
+        ]
+    },
 
     // --- MUSICIAN ---
     {
@@ -774,5 +822,38 @@ export const CAREER_EVENTS = [
             { text: 'Serve proudly', effects: { stress: 20, karma: 5, money: 5000 }, outcomeText: 'You returned home safe with a medal.', type: 'good' },
             { text: 'Desert', effects: { karma: -50, happiness: -20 }, outcomeText: 'You went AWOL and are now a fugitive.', type: 'bad' }
         ]
+    }
+];
+
+export const PANDEMIC_EVENTS = [
+    {
+        id: 'pan_mask',
+        trigger: (person) => Math.random() < 0.2, // 20% chance per year during pandemic
+        text: 'A lady in the grocery store refuses to wear a mask and is screaming.',
+        choices: [
+            { text: 'Confront her', effects: { stress: 5, karma: 5 }, outcomeText: 'She coughed on you.', type: 'bad' },
+            { text: 'Ignore her', effects: { happiness: -2 }, outcomeText: 'You bought your beans and left.', type: 'neutral' }
+        ]
+    },
+    {
+        id: 'pan_lockdown',
+        trigger: (person) => Math.random() < 0.15,
+        text: 'The government has issued a strict lockdown. No leaving the house!',
+        effects: { happiness: -10, stress: 10, health: 5 }, // Health goes up (safe), insane goes up
+        type: 'neutral'
+    },
+    {
+        id: 'pan_infected',
+        trigger: (person) => Math.random() < 0.1,
+        text: 'You have tested positive for the virus.',
+        effects: { health: -30, happiness: -20 },
+        type: 'bad'
+    },
+    {
+        id: 'pan_remote',
+        trigger: (person) => person.job && Math.random() < 0.2,
+        text: 'Your job has switched to remote work.',
+        effects: { happiness: 5, stress: -5 },
+        type: 'good'
     }
 ];

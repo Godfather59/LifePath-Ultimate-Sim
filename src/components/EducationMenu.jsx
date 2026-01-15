@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { UNIVERSITIES, GRAD_SCHOOLS, PUBLIC_SCHOOLS } from '../logic/Education';
+import { PUBLIC_SCHOOLS } from '../logic/Education';
+import { UNIVERSITY_MAJORS, GRAD_SCHOOLS, checkPrereq } from '../logic/EducationLogic';
 import './Modal.css';
 
 export function EducationMenu({ person, onEnroll, onStudy, onDropOut, onClose }) {
@@ -18,7 +19,7 @@ export function EducationMenu({ person, onEnroll, onStudy, onDropOut, onClose })
                 if (s.type === 'high_school' && person.age >= 14 && person.age < 18) return true;
                 return false;
             });
-            case 'uni': return UNIVERSITIES;
+            case 'uni': return UNIVERSITY_MAJORS;
             case 'grad': return GRAD_SCHOOLS;
             default: return [];
         }
@@ -145,8 +146,19 @@ export function EducationMenu({ person, onEnroll, onStudy, onDropOut, onClose })
 
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                                 {currentList.map(school => {
-                                    const hasReq = !school.req_degree || person.educationHistory.includes(school.req_degree);
-                                    const alreadyHave = person.educationHistory.includes(school.grant_degree);
+                                    // Check Degree Prereq
+                                    let hasReq = true;
+                                    if (school.req_degree) {
+                                        // If it's a specific string match (old logic)
+                                        // hasReq = person.educationHistory.includes(school.req_degree);
+
+                                        // New Logic with checkPrereq
+                                        // We need to pass the list of degrees player has (as strings of types/majors)
+                                        const degrees = person.degrees ? person.degrees.map(d => d.type) : [];
+                                        hasReq = checkPrereq(school.id, degrees);
+                                    }
+
+                                    const alreadyHave = person.educationHistory.some(h => h.includes(school.name)); // Simplified check
 
                                     return (
                                         <div key={school.id} className="list-item">

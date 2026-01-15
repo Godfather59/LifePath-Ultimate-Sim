@@ -104,6 +104,11 @@ export function GameOver({ person, onRestart }) {
                                     }}
                                 >
                                     {child.name} (Age {child.age || '?'})
+                                    {child.traits && child.traits.length > 0 && (
+                                        <div style={{ fontSize: '0.8em', marginTop: '4px', color: '#ffeb3b' }}>
+                                            {child.traits.join(', ')}
+                                        </div>
+                                    )}
                                 </button>
                             ))}
                         </div>

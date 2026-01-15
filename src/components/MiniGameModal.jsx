@@ -7,13 +7,29 @@ export function MiniGameModal({ type, difficulty, onResult, onClose }) {
     const [playerPos, setPlayerPos] = useState({ x: 0, y: 0 });
 
     // Config based on type
-    const GRID_SIZE = 6;
-    const GOAL_POS = { x: 5, y: 5 };
-    const OBSTACLES = [
-        { x: 2, y: 1 }, { x: 2, y: 2 }, { x: 2, y: 3 },
-        { x: 4, y: 2 }, { x: 4, y: 4 }, { x: 1, y: 4 },
-        { x: 5, y: 1 }
-    ];
+    // Dynamic Config based on difficulty
+    const GRID_SIZE = 5 + difficulty; // 6, 7, 8...
+
+    // Generate Level
+    const [levelConfig] = useState(() => {
+        const goal = { x: GRID_SIZE - 1, y: GRID_SIZE - 1 };
+        const obstacles = [];
+        const numObstacles = Math.floor((GRID_SIZE * GRID_SIZE) * (0.15 + (difficulty * 0.05))); // 20-30% density
+
+        // Simple random placement (ensuring start and end are clear)
+        for (let i = 0; i < numObstacles; i++) {
+            let x, y;
+            do {
+                x = Math.floor(Math.random() * GRID_SIZE);
+                y = Math.floor(Math.random() * GRID_SIZE);
+            } while ((x === 0 && y === 0) || (x === goal.x && y === goal.y) || obstacles.some(o => o.x === x && o.y === y));
+            obstacles.push({ x, y });
+        }
+        return { goal, obstacles };
+    });
+
+    const GOAL_POS = levelConfig.goal;
+    const OBSTACLES = levelConfig.obstacles;
 
     const movePlayer = useCallback((dx, dy) => {
         if (gameState !== 'playing') return;

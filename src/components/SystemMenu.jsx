@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './Modal.css';
 
 export function SystemMenu({ onResume, onSave, onExit, onGodMode }) {
@@ -36,7 +36,7 @@ export function SystemMenu({ onResume, onSave, onExit, onGodMode }) {
                         ⚡ God Mode
                     </button>
 
-                    <div style={{ borderTop: '1px solid #eee', margin: '8px 0' }}></div>
+                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', margin: '8px 0' }}></div>
 
                     <button
                         className="btn-danger"

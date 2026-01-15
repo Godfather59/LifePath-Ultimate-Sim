@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { LUXURY_ASSETS } from '../logic/CuratedAssets';
+import { STOCKS, CRYPTO } from '../logic/Investments';
 import './Modal.css';
 
-export function AssetsMenu({ person, onBuy, onSell, onClose }) {
-    const [activeTab, setActiveTab] = useState('owned'); // 'owned' | 'real_estate' | 'cars' | 'luxury'
+export function AssetsMenu({ person, onBuy, onSell, onRent, onEvict, onClose }) {
+    const [activeTab, setActiveTab] = useState('owned'); // 'owned' | 'real_estate' | 'cars' | 'luxury' | 'investments'
 
     // Use persistent market from person object, or fallback to empty arrays
     const realEstateList = person.market?.realEstate || [];
@@ -42,6 +43,27 @@ export function AssetsMenu({ person, onBuy, onSell, onClose }) {
         setSelectedAsset(null);
     };
 
+    // Renting State
+    const [rentingAssetIndex, setRentingAssetIndex] = useState(null);
+    const [monthlyRentInput, setMonthlyRentInput] = useState(2000);
+
+    // Investment State
+    const [investModal, setInvestModal] = useState(null); // { type: 'buy'|'sell', asset: {...} }
+    const [investAmount, setInvestAmount] = useState(1000);
+
+    const handleRentClick = (index) => {
+        const asset = person.assets[index];
+        // Default rent Suggestion: 0.8% of value / 12 ~ 
+        // Or simpler: Value * 0.005
+        setMonthlyRentInput(Math.floor(asset.value * 0.005));
+        setRentingAssetIndex(index);
+    };
+
+    const confirmRent = () => {
+        onRent(rentingAssetIndex, parseInt(monthlyRentInput));
+        setRentingAssetIndex(null);
+    };
+
     const renderOwned = () => {
         if (person.assets.length === 0) {
             return (
@@ -59,15 +81,24 @@ export function AssetsMenu({ person, onBuy, onSell, onClose }) {
                     <div className="list-item-subtitle" style={{ color: 'var(--text-secondary)' }}>
                         Valued at ${asset.value.toLocaleString()}
                         {asset.isMortgaged && <span style={{ color: '#ff9800', marginLeft: '6px' }}> (Mortgaged)</span>}
+                        {asset.isRented && <span style={{ color: '#4caf50', marginLeft: '6px' }}> (Rented)</span>}
                     </div>
                 </div>
-                <button
-                    className="btn-danger"
-                    style={{ padding: '6px 12px', fontSize: '0.9em' }}
-                    onClick={() => onSell(index)}
-                >
-                    Sell
-                </button>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                    {asset.type === 'Real Estate' && !asset.isRented && (
+                        <button className="btn-primary" style={{ padding: '6px 12px', fontSize: '0.9em' }} onClick={() => handleRentClick(index)}>Rent Out</button>
+                    )}
+                    {asset.type === 'Real Estate' && asset.isRented && (
+                        <button className="btn-secondary" style={{ padding: '6px 12px', fontSize: '0.9em' }} onClick={() => onEvict(index)}>Evict</button>
+                    )}
+                    <button
+                        className="btn-danger"
+                        style={{ padding: '6px 12px', fontSize: '0.9em' }}
+                        onClick={() => onSell(index)}
+                    >
+                        Sell
+                    </button>
+                </div>
             </div>
         ));
     };
@@ -95,6 +126,7 @@ export function AssetsMenu({ person, onBuy, onSell, onClose }) {
             </div>
         ));
     };
+
 
     const renderLuxury = () => {
         return LUXURY_ASSETS.map((asset) => (
@@ -170,9 +202,108 @@ export function AssetsMenu({ person, onBuy, onSell, onClose }) {
         );
     };
 
+    const renderRentModal = () => {
+        if (rentingAssetIndex === null) return null;
+        const asset = person.assets[rentingAssetIndex];
+        return (
+            <div className="modal-overlay" style={{ zIndex: 210 }}>
+                <div className="modal-content" style={{ maxWidth: '300px' }}>
+                    <h3>Rent out {asset.name}</h3>
+                    <p>Suggested Rent: ${Math.floor(asset.value * 0.005).toLocaleString()}/mo</p>
+                    <label>Monthly Rent ($):</label>
+                    <input
+                        type="number"
+                        value={monthlyRentInput}
+                        onChange={(e) => setMonthlyRentInput(e.target.value)}
+                        style={{ width: '100%', padding: '8px', marginBottom: '10px' }}
+                    />
+                    <button className="btn-primary" onClick={confirmRent}>Confirm</button>
+                    <button className="btn-secondary" onClick={() => setRentingAssetIndex(null)} style={{ marginTop: '10px' }}>Cancel</button>
+                </div>
+            </div>
+        );
+    }
+
+    const renderInvestModal = () => {
+        if (!investModal) return null;
+        const isBuy = investModal.type === 'buy';
+        const asset = investModal.asset;
+
+        return (
+            <div className="modal-overlay" style={{ zIndex: 220 }}>
+                <div className="modal-content" style={{ maxWidth: '300px' }}>
+                    <h3>{isBuy ? 'Buy' : 'Sell'} {asset.name}</h3>
+                    {isBuy && (
+                        <>
+                            <p>How much to invest?</p>
+                            <input type="number" style={{ width: '100%', padding: '8px' }} value={investAmount} onChange={(e) => setInvestAmount(parseInt(e.target.value) || 0)} />
+                            <div style={{ fontSize: '0.8em', marginTop: '5px' }}>Cash: ${person.money.toLocaleString()}</div>
+                        </>
+                    )}
+                    {!isBuy && (
+                        <p>Sell entire position? (Partial sell not implemented yet)</p>
+                    )}
+
+                    <button className="btn-primary" style={{ marginTop: '15px' }} onClick={() => {
+                        if (isBuy) onInvest(asset, investAmount);
+                        else onDivest(asset.id);
+                        setInvestModal(null);
+                    }}>Confirm</button>
+                    <button className="btn-secondary" style={{ marginTop: '10px' }} onClick={() => setInvestModal(null)}>Cancel</button>
+                </div>
+            </div>
+        );
+    };
+
+    const renderInvestments = () => {
+        return (
+            <div>
+                <h3 style={{ marginBottom: '16px', fontSize: '1.1em' }}>Stock Market & Crypto</h3>
+
+                {/* Index Fund */}
+                <div className="list-item" style={{ marginBottom: '12px' }}>
+                    <div>
+                        <div className="list-item-title">📈 Index Fund</div>
+                        <div className="list-item-subtitle">
+                            Current Price: ${person.market?.indexFundPrice || 100}/share
+                        </div>
+                        <div style={{ fontSize: '0.85em', color: '#888', marginTop: '4px' }}>
+                            Owned: {person.investments?.indexFund || 0} shares
+                        </div>
+                    </div>
+                    <button className="btn-primary" style={{ padding: '8px 16px' }}>
+                        Buy/Sell
+                    </button>
+                </div>
+
+                {/* Dogecoin */}
+                <div className="list-item">
+                    <div>
+                        <div className="list-item-title">🪙 Dogecoin</div>
+                        <div className="list-item-subtitle">
+                            Current Price: ${(person.market?.dogecoinPrice || 0.50).toFixed(2)}/coin
+                        </div>
+                        <div style={{ fontSize: '0.85em', color: '#888', marginTop: '4px' }}>
+                            Owned: {person.investments?.dogecoin || 0} coins
+                        </div>
+                    </div>
+                    <button className="btn-primary" style={{ padding: '8px 16px' }}>
+                        Buy/Sell
+                    </button>
+                </div>
+
+                <div style={{ marginTop: '20px', padding: '12px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', fontSize: '0.9em', color: '#888' }}>
+                    💡 Note: Market prices update every year. Index Fund is stable, Dogecoin is volatile!
+                </div>
+            </div>
+        );
+    };
+
     return (
         <div className="modal-overlay">
             {renderBuyModal()}
+            {renderRentModal()}
+            {renderInvestModal()}
             <div className="modal-content" style={{ maxWidth: '600px', height: '80vh', display: 'flex', flexDirection: 'column' }}>
                 <div className="modal-header">
                     <h2 className="modal-title">Assets & Shopping</h2>
@@ -189,6 +320,7 @@ export function AssetsMenu({ person, onBuy, onSell, onClose }) {
                         { id: 'real_estate', label: 'Real Estate', icon: '🏠' },
                         { id: 'cars', label: 'Car Dealer', icon: '🚗' },
                         { id: 'luxury', label: 'Luxury', icon: '💎' },
+                        { id: 'investments', label: 'Investments', icon: '📈' },
                     ].map(tab => (
                         <button
                             key={tab.id}
@@ -215,6 +347,7 @@ export function AssetsMenu({ person, onBuy, onSell, onClose }) {
                     {activeTab === 'real_estate' && renderMarketList(realEstateList)}
                     {activeTab === 'cars' && renderMarketList(carList)}
                     {activeTab === 'luxury' && renderLuxury()}
+                    {activeTab === 'investments' && renderInvestments()}
                 </div>
             </div>
         </div>

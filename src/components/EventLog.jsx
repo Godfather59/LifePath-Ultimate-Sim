@@ -23,7 +23,7 @@ export function EventLog({ history = [] }) {
                     <span className="event-age-badge">Age {event.age}</span>
                 </div>
             ))}
-            <div style={{ height: '50px' }} /> {/* Extra spacer ensures last item clears bottom menu */}
+
             <div ref={endRef} />
         </div>
     );

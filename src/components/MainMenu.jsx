@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './Modal.css'; // Ensure we have access to variables if needed, though mostly global
+import { generateRandomName } from '../logic/NameGenerator';
 
 const COUNTRIES = [
     "United States", "United Kingdom", "Canada", "Australia",
@@ -7,7 +8,7 @@ const COUNTRIES = [
     "India", "Russia", "Mexico", "Spain", "South Korea"
 ];
 
-export function MainMenu({ onStartGame, onContinue, hasSave, saveSummary }) {
+export function MainMenu({ onStartGame, onContinue, onLoad, hasSave, saveSummary }) {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [gender, setGender] = useState("Male");
@@ -22,15 +23,7 @@ export function MainMenu({ onStartGame, onContinue, hasSave, saveSummary }) {
     };
 
     const randomizeName = () => {
-        const maleNames = ["James", "John", "Robert", "Michael", "William", "David", "Liam", "Noah"];
-        const femaleNames = ["Mary", "Patricia", "Jennifer", "Linda", "Elizabeth", "Barbara", "Emma", "Olivia"];
-        const lastNames = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis"];
-
-        const first = gender === 'Male'
-            ? maleNames[Math.floor(Math.random() * maleNames.length)]
-            : femaleNames[Math.floor(Math.random() * femaleNames.length)];
-        const last = lastNames[Math.floor(Math.random() * lastNames.length)];
-
+        const { firstName: first, lastName: last } = generateRandomName(gender);
         setFirstName(first);
         setLastName(last);
     };
@@ -42,16 +35,16 @@ export function MainMenu({ onStartGame, onContinue, hasSave, saveSummary }) {
             alignItems: 'center',
             justifyContent: 'center',
             minHeight: '100vh',
-            padding: '20px',
-            paddingTop: 'max(60px, env(safe-area-inset-top))',
+            padding: '10px',
+            paddingTop: 'max(20px, env(safe-area-inset-top))',
             backgroundColor: '#121212', // Fallback
             background: 'linear-gradient(135deg, #1e1e2e 0%, #2d2d44 100%)',
             textAlign: 'center',
             color: 'white'
         }}>
             <h1 style={{
-                marginBottom: '30px',
-                fontSize: '3rem',
+                marginBottom: '10px',
+                fontSize: '2rem',
                 fontWeight: '900',
                 background: 'linear-gradient(to right, #4facfe, #00f2fe)',
                 WebkitBackgroundClip: 'text',
@@ -62,20 +55,20 @@ export function MainMenu({ onStartGame, onContinue, hasSave, saveSummary }) {
             <div style={{
                 backgroundColor: 'rgba(255, 255, 255, 0.05)',
                 backdropFilter: 'blur(10px)',
-                padding: '24px',
-                borderRadius: '24px',
+                padding: '12px',
+                borderRadius: '16px',
                 width: '100%',
                 maxWidth: '400px',
                 boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
                 border: '1px solid rgba(255,255,255,0.1)'
             }}>
-                <h2 style={{ marginTop: 0, color: 'white' }}>Ultimate Sim</h2>
+                <h2 style={{ marginTop: 0, marginBottom: '8px', color: 'white', fontSize: '1.2rem' }}>Ultimate Sim</h2>
 
                 {hasSave && saveSummary && (
-                    <div style={{ marginBottom: '24px', paddingBottom: '20px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                        <div style={{ marginBottom: '12px', color: '#ccc' }}>
-                            <div style={{ fontWeight: 'bold', fontSize: '1.2em', color: 'white' }}>{saveSummary.name}</div>
-                            <div>Age {saveSummary.age} • {saveSummary.job}</div>
+                    <div style={{ marginBottom: '12px', paddingBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                        <div style={{ marginBottom: '8px', color: '#ccc' }}>
+                            <div style={{ fontWeight: 'bold', fontSize: '1.1em', color: 'white' }}>{saveSummary.name}</div>
+                            <div style={{ fontSize: '0.9em' }}>Age {saveSummary.age} • {saveSummary.job}</div>
                         </div>
                         <button
                             onClick={onContinue}
@@ -97,12 +90,32 @@ export function MainMenu({ onStartGame, onContinue, hasSave, saveSummary }) {
                     </div>
                 )}
 
-                <h3 style={{ marginTop: 0, marginBottom: '16px', color: '#888', textTransform: 'uppercase', fontSize: '0.8rem', letterSpacing: '1px' }}>
+                {hasSave && (
+                    <button
+                        onClick={onLoad}
+                        className="btn-secondary"
+                        style={{
+                            width: '100%',
+                            fontSize: '1em',
+                            background: 'rgba(255,255,255,0.1)',
+                            border: '1px solid rgba(255,255,255,0.2)',
+                            padding: '12px',
+                            borderRadius: '12px',
+                            color: '#ccc',
+                            marginBottom: '24px',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        📂 Load Other Game
+                    </button>
+                )}
+
+                <h3 style={{ marginTop: 0, marginBottom: '8px', color: '#888', textTransform: 'uppercase', fontSize: '0.7rem', letterSpacing: '1px' }}>
                     Start New Life
                 </h3>
 
-                <div style={{ marginBottom: '16px', textAlign: 'left' }}>
-                    <label className="bold" style={{ display: 'block', marginBottom: '8px', color: '#ddd' }}>First Name</label>
+                <div style={{ marginBottom: '8px', textAlign: 'left' }}>
+                    <label className="bold" style={{ display: 'block', marginBottom: '4px', color: '#ddd', fontSize: '0.85rem' }}>First Name</label>
                     <input
                         type="text"
                         value={firstName}
@@ -115,8 +128,8 @@ export function MainMenu({ onStartGame, onContinue, hasSave, saveSummary }) {
                     />
                 </div>
 
-                <div style={{ marginBottom: '16px', textAlign: 'left' }}>
-                    <label className="bold" style={{ display: 'block', marginBottom: '8px', color: '#ddd' }}>Last Name</label>
+                <div style={{ marginBottom: '8px', textAlign: 'left' }}>
+                    <label className="bold" style={{ display: 'block', marginBottom: '4px', color: '#ddd', fontSize: '0.85rem' }}>Last Name</label>
                     <input
                         type="text"
                         value={lastName}
@@ -131,25 +144,26 @@ export function MainMenu({ onStartGame, onContinue, hasSave, saveSummary }) {
 
                 <button
                     onClick={randomizeName}
-                    style={{ marginBottom: '20px', fontSize: '0.9em', color: '#4facfe', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontWeight: 'bold' }}
+                    style={{ marginBottom: '12px', fontSize: '0.8em', color: '#4facfe', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontWeight: 'bold' }}
                 >
                     🎲 Randomize Name
                 </button>
 
-                <div style={{ marginBottom: '16px', textAlign: 'left' }}>
-                    <label className="bold" style={{ display: 'block', marginBottom: '8px', color: '#ddd' }}>Gender</label>
-                    <div className="flex gap-2" style={{ display: 'flex', gap: '10px' }}>
+                <div style={{ marginBottom: '12px', textAlign: 'left' }}>
+                    <label className="bold" style={{ display: 'block', marginBottom: '4px', color: '#ddd', fontSize: '0.85rem' }}>Gender</label>
+                    <div className="flex gap-2" style={{ display: 'flex', gap: '8px' }}>
                         <button
                             onClick={() => setGender('Male')}
                             style={{
                                 flex: 1,
-                                padding: '12px',
-                                borderRadius: '12px',
+                                padding: '10px',
+                                borderRadius: '10px',
                                 border: 'none',
                                 cursor: 'pointer',
                                 backgroundColor: gender === 'Male' ? '#2196f3' : 'rgba(255,255,255,0.1)',
                                 color: gender === 'Male' ? 'white' : '#888',
-                                transition: 'all 0.2s'
+                                transition: 'all 0.2s',
+                                fontSize: '0.9rem'
                             }}
                         >
                             Male
@@ -158,13 +172,14 @@ export function MainMenu({ onStartGame, onContinue, hasSave, saveSummary }) {
                             onClick={() => setGender('Female')}
                             style={{
                                 flex: 1,
-                                padding: '12px',
-                                borderRadius: '12px',
+                                padding: '10px',
+                                borderRadius: '10px',
                                 border: 'none',
                                 cursor: 'pointer',
                                 backgroundColor: gender === 'Female' ? '#e91e63' : 'rgba(255,255,255,0.1)',
                                 color: gender === 'Female' ? 'white' : '#888',
-                                transition: 'all 0.2s'
+                                transition: 'all 0.2s',
+                                fontSize: '0.9rem'
                             }}
                         >
                             Female
@@ -172,14 +187,15 @@ export function MainMenu({ onStartGame, onContinue, hasSave, saveSummary }) {
                     </div>
                 </div>
 
-                <div style={{ marginBottom: '24px', textAlign: 'left' }}>
-                    <label className="bold" style={{ display: 'block', marginBottom: '8px', color: '#ddd' }}>Country</label>
+                <div style={{ marginBottom: '16px', textAlign: 'left' }}>
+                    <label className="bold" style={{ display: 'block', marginBottom: '4px', color: '#ddd', fontSize: '0.85rem' }}>Country</label>
                     <select
                         value={country}
                         onChange={(e) => setCountry(e.target.value)}
                         style={{
-                            width: '100%', padding: '12px', borderRadius: '12px',
-                            border: '1px solid rgba(255,255,255,0.2)', backgroundColor: '#333', color: 'white', outline: 'none'
+                            width: '100%', padding: '10px', borderRadius: '10px',
+                            border: '1px solid rgba(255,255,255,0.2)', backgroundColor: '#333', color: 'white', outline: 'none',
+                            fontSize: '0.9rem'
                         }}
                     >
                         {COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
@@ -190,12 +206,12 @@ export function MainMenu({ onStartGame, onContinue, hasSave, saveSummary }) {
                     onClick={handleStart}
                     style={{
                         width: '100%',
-                        padding: '16px',
+                        padding: '12px',
                         backgroundColor: '#00c6ff', /* Fallback */
                         background: 'linear-gradient(to right, #00c6ff, #0072ff)',
                         color: 'white',
                         fontWeight: 'bold',
-                        fontSize: '1.2rem',
+                        fontSize: '1.1rem',
                         boxShadow: '0 4px 15px rgba(0, 114, 255, 0.4)',
                         border: 'none',
                         borderRadius: '12px',

@@ -8,7 +8,10 @@ export function GodModeMenu({ person, onUpdate, onClose }) {
         health: person.health,
         smarts: person.smarts,
         looks: person.looks,
-        karma: person.karma || 50
+        karma: person.karma || 50,
+        stress: person.stress || 0,
+        fame: person.fame || 0,
+        notoriety: person.notoriety || 0
     });
 
     const handleChange = (field, value) => {
@@ -31,6 +34,9 @@ export function GodModeMenu({ person, onUpdate, onClose }) {
             p.smarts = updates.smarts;
             p.looks = updates.looks;
             p.karma = updates.karma;
+            p.stress = updates.stress;
+            p.fame = updates.fame;
+            p.notoriety = updates.notoriety;
             p.logEvent("⚡ GOD MODE ACTIVATED: Reality has been altered.", "good");
         });
         onClose();
@@ -92,6 +98,36 @@ export function GodModeMenu({ person, onUpdate, onClose }) {
                             onChange={(e) => handleChange('looks', e.target.value)}
                         />
                         <span style={{ float: 'right' }}>{stats.looks}%</span>
+                    </div>
+
+                    <div className="form-group">
+                        <label>Stress (0-100)</label>
+                        <input
+                            type="range" min="0" max="100"
+                            value={stats.stress}
+                            onChange={(e) => handleChange('stress', e.target.value)}
+                        />
+                        <span style={{ float: 'right' }}>{stats.stress}%</span>
+                    </div>
+
+                    <div className="form-group">
+                        <label>Fame (0-100)</label>
+                        <input
+                            type="range" min="0" max="100"
+                            value={stats.fame}
+                            onChange={(e) => handleChange('fame', e.target.value)}
+                        />
+                        <span style={{ float: 'right' }}>{stats.fame}%</span>
+                    </div>
+
+                    <div className="form-group">
+                        <label>Notoriety (0-100)</label>
+                        <input
+                            type="range" min="0" max="100"
+                            value={stats.notoriety}
+                            onChange={(e) => handleChange('notoriety', e.target.value)}
+                        />
+                        <span style={{ float: 'right' }}>{stats.notoriety}%</span>
                     </div>
 
                     <button className="btn-primary" onClick={handleSave} style={{ background: 'linear-gradient(45deg, #ffd700, #ffa500)', color: 'black', fontWeight: 'bold' }}>

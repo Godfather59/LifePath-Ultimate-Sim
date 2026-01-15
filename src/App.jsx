@@ -20,6 +20,7 @@ import { SystemMenu } from './components/SystemMenu';
 import { LoveMenu } from './components/LoveMenu';
 import { CareerModal } from './components/CareerModal';
 import { MafiaMenu } from './components/MafiaMenu';
+import { RoyaltyMenu } from './components/RoyaltyMenu';
 import { PoliticsMenu } from './components/PoliticsMenu';
 import { GamblingMenu } from './components/GamblingMenu';
 import { SocialMenu } from './components/SocialMenu';
@@ -27,14 +28,27 @@ import { GodModeMenu } from './components/GodModeMenu';
 import { Minesweeper } from './components/Minesweeper';
 import { DoctorMenu } from './components/DoctorMenu';
 import { SaveSlotMenu } from './components/SaveSlotMenu';
+import { HobbiesMenu } from './components/HobbiesMenu';
+import { PetsMenu } from './components/PetsMenu';
+import { PrisonMenu } from './components/PrisonMenu';
+import { WillMenu } from './components/WillMenu';
+import { StatsMenu } from './components/StatsMenu';
+import { FamilyTreeMenu } from './components/FamilyTreeMenu';
 import { ACHIEVEMENTS, checkAchievements } from './logic/Achievements';
+import { applyTheme, getStoredTheme } from './logic/themes';
+import { lifetimeStats } from './logic/LifetimeStats';
+import { familyTree } from './logic/DynastyMode';
 
 function App() {
   const [person, setPerson] = useState(null);
   const [modal, setModal] = useState(null); // 'occupation', 'activities', etc.
+  const [modalData, setModalData] = useState({}); // Extra data for modals
 
   // Achievements State
   const [achievements, setAchievements] = useState([]);
+
+  // Theme State
+  const [currentTheme, setCurrentTheme] = useState(getStoredTheme());
 
   // Save Slots State
   const [currentSlotId, setCurrentSlotId] = useState(null);
@@ -105,73 +119,80 @@ function App() {
   const [hasSave, setHasSave] = useState(false);
   const [saveSummary, setSaveSummary] = useState(null);
 
-  // Initialize: Check for save file
+  // Initialize: Check for save file and apply theme
   useEffect(() => {
+    // Apply saved theme
+    applyTheme(currentTheme);
+
     // Load Achievements
     const savedAch = localStorage.getItem('bitlife_achievements');
     if (savedAch) {
       setAchievements(JSON.parse(savedAch));
     }
 
-    // Check for Game Save
-    const savedData = localStorage.getItem('bitlife_save'); // This is the old single save, will be removed later
-    if (savedData) {
+    // Check for Game Saves (Meta)
+    const metaStr = localStorage.getItem('bitlife_save_meta');
+    // Migration check: if no meta but old save exists
+    const oldSave = localStorage.getItem('bitlife_save');
+    if (!metaStr && oldSave) {
+      // Migrate Logic could go here, or just ignore. 
+      // Let's keep it simple: if meta exists, use it.
+    }
+
+    if (metaStr) {
       try {
-        const data = JSON.parse(savedData);
-        setHasSave(true);
-        // Extract summary details safely
-        setSaveSummary({
-          name: `${data.name?.first || 'Unknown'} ${data.name?.last || ''}`,
-          age: data.age || 0,
-          job: data.job?.title || 'Unemployed'
-        });
-      } catch (e) {
-        console.error("Corrupt save found:", e);
-        localStorage.removeItem('bitlife_save');
-      }
+        const meta = JSON.parse(metaStr);
+        if (meta.length > 0) {
+          setHasSave(true);
+          const recent = meta.sort((a, b) => b.lastPlayed - a.lastPlayed)[0];
+          setSaveSummary(recent);
+        }
+      } catch (e) { console.error(e); }
     }
   }, []);
 
+
+
   const handleContinue = () => {
-    const savedData = localStorage.getItem('bitlife_save');
-    if (savedData) {
-      try {
-        const data = JSON.parse(savedData);
-        const loadedPerson = Person.load(data);
-        setPerson(loadedPerson);
-        // Ensure toast system is ready? It's part of render, so yes.
-        showToast(`Welcome back, ${loadedPerson.name.first}!`, "good");
-      } catch (e) {
-        showToast("Failed to load save file.", "bad");
-      }
+    // Continue most recent save
+    const meta = JSON.parse(localStorage.getItem('bitlife_save_meta') || '[]');
+    if (meta.length > 0) {
+      const recent = meta.sort((a, b) => b.lastPlayed - a.lastPlayed)[0];
+      loadGameData(recent.id);
     }
   };
 
+  const handleLoadSlot = (slotId) => {
+    loadGameData(slotId);
+    setModal(null);
+  };
+
+
   const handleExitToMenu = () => {
     // Save before exiting just in case
-    if (person) {
-      localStorage.setItem('bitlife_save', JSON.stringify(person));
+    if (person && currentSlotId) {
+      saveGameData(person, currentSlotId);
     }
     setPerson(null);
-    // Re-check save state
-    setHasSave(true);
-    // We assume if we just exited, we have a save. 
-    // To be safer we could re-read localStorage but this is fine.
-    const savedData = localStorage.getItem('bitlife_save');
-    if (savedData) {
-      const data = JSON.parse(savedData);
-      setSaveSummary({
-        name: `${data.name?.first} ${data.name?.last}`,
-        age: data.age,
-        job: data.job?.title || 'Unemployed'
-      });
+    setCurrentSlotId(null);
+
+    // Refresh Meta for Main Menu
+    const meta = JSON.parse(localStorage.getItem('bitlife_save_meta') || '[]');
+    if (meta.length > 0) {
+      setHasSave(true);
+      // Find most recent
+      const recent = meta.sort((a, b) => b.lastPlayed - a.lastPlayed)[0];
+      setSaveSummary(recent);
+    } else {
+      setHasSave(false);
+      setSaveSummary(null);
     }
   };
 
   // Auto-save whenever person changes
   useEffect(() => {
-    if (person) {
-      localStorage.setItem('bitlife_save', JSON.stringify(person));
+    if (person && currentSlotId) {
+      saveGameData(person, currentSlotId);
 
       // Check for new achievements
       const newUnlocks = checkAchievements(person, achievements);
@@ -188,7 +209,7 @@ function App() {
         updatePerson(person);
       }
     }
-  }, [person, achievements]);
+  }, [person, achievements, currentSlotId]);
 
   // Helper to safely update person state
   const runAction = (actionFn) => {
@@ -208,6 +229,14 @@ function App() {
   const handleAgeUp = () => {
     if (!person.isAlive) return;
     runAction(p => GameEngine.ageUp(p));
+  };
+
+  const handleAgeSkip = (years) => {
+    if (!person.isAlive) return;
+    for (let i = 0; i < years; i++) {
+      if (!person.isAlive) break;
+      runAction(p => GameEngine.ageUp(p));
+    }
   };
 
   // Toast State
@@ -245,6 +274,10 @@ function App() {
       setModal('relationships');
       return;
     }
+    if (type === 'pets') {
+      setModal('pets');
+      return;
+    }
     if (type === 'activities') {
       setModal('activities');
       return;
@@ -260,8 +293,8 @@ function App() {
   const handleJobApplication = (job) => {
     runAction(p => {
       if (job.isMilitary) {
-        p.joinMilitary(job.branch);
-        setModal(null);
+        const success = p.joinMilitary(job.branch, job.isOfficer);
+        if (success) setModal(null);
       } else {
         const hired = p.setJob(job);
         if (hired) setModal(null);
@@ -286,12 +319,21 @@ function App() {
       setModal('career_music');
       return;
     }
+    if (activity.isMafia) {
+      setModal('mafia');
+      return;
+    }
     if (activity.crimeType === 'burglary') {
       setModal('minigame_burglary');
+      setModalData({ difficulty: Math.floor(Math.random() * 3) + 1 });
       return;
     }
     if (activity.isMafia) {
       setModal('mafia');
+      return;
+    }
+    if (activity.isRoyalty) {
+      setModal('royalty');
       return;
     }
     if (activity.isPolitics) {
@@ -306,6 +348,22 @@ function App() {
       setModal('doctor');
       return;
     }
+    if (activity.isDoctor) {
+      setModal('doctor');
+      return;
+    }
+    if (activity.isHobbies) {
+      setModal('hobbies');
+      return;
+    }
+    if (activity.isWill) {
+      if (person.age < 18) {
+        showToast("You must be 18 to create a will!", "bad");
+        return;
+      }
+      setModal('will');
+      return;
+    }
     runAction(p => p.performActivity(activity));
   };
 
@@ -316,8 +374,11 @@ function App() {
     if (showLoadMenu) {
       return (
         <SaveSlotMenu
-          onSelectSlot={loadGameData}
-          onNewGame={() => setShowLoadMenu(false)} // user wants new game instead
+          onSelectSlot={(slotId) => {
+            loadGameData(slotId);
+            setShowLoadMenu(false);
+          }}
+          onNewGame={() => setShowLoadMenu(false)}
           onClose={() => setShowLoadMenu(false)}
         />
       );
@@ -325,9 +386,10 @@ function App() {
     return (
       <MainMenu
         onStartGame={initNewGame}
-        onContinue={() => setShowLoadMenu(true)} // "Load Game" button now opens menu
-        hasSave={true} // Always show Load button (it handles empty check inside)
-        saveSummary={null} // Deprecated summary view
+        onContinue={handleContinue}
+        onLoad={() => setShowLoadMenu(true)}
+        hasSave={hasSave}
+        saveSummary={saveSummary}
       />
     );
   }
@@ -336,7 +398,19 @@ function App() {
     <div className="app-container">
       <Hud person={person} onOpenMenu={() => setModal('system')} />
       <EventLog history={person.history} />
-      <ActionMenu onAgeUp={handleAgeUp} onAction={handleAction} />
+      {person.isInPrison ? (
+        <PrisonMenu
+          person={person}
+          onAction={(action) => runAction(p => p.prisonAction(action))}
+          onClose={() => { }}
+        />
+      ) : (
+        <ActionMenu
+          onAgeUp={handleAgeUp}
+          onAction={handleAction}
+          onAgeSkip={handleAgeSkip}
+        />
+      )}
 
       {/* Interactive Modals */}
       {modal === 'system' && (
@@ -413,7 +487,20 @@ function App() {
       {modal === 'social' && (
         <SocialMenu
           person={person}
-          onUpdatePerson={(p) => updatePerson(p)}
+          onPost={(platform, post) => runAction(p => p.postToSocial(platform.id, post.id))}
+          onMonetize={(platform) => runAction(p => p.monetizeSocial(platform.id))}
+          onBuyFollowers={(platform) => {
+            runAction(p => {
+              if (p.money >= 100) {
+                p.money -= 100;
+                if (!p.social.platforms[platform.id]) p.social.platforms[platform.id] = { followers: 0, posts: 0 };
+                p.social.platforms[platform.id].followers += 500;
+                p.logEvent(`You bought 500 followers for ${platform.name}.`, "neutral");
+              } else {
+                p.logEvent("You can't afford that!", "bad");
+              }
+            });
+          }}
           onClose={() => setModal(null)}
         />
       )}
@@ -421,8 +508,8 @@ function App() {
       {modal === 'relationships' && (
         <RelationshipsMenu
           person={person}
-          onInteract={(id, action) => {
-            runAction(p => p.interactWithRel(id, action));
+          onInteract={(id, action, payload) => {
+            runAction(p => p.interactWithRel(id, action, payload));
           }}
           onClose={() => setModal(null)}
         />
@@ -432,13 +519,29 @@ function App() {
         <MafiaMenu
           person={person}
           onJoin={(family) => {
-            const success = person.joinMafia(family); // Returns bool, but we need to update state
-            runAction(p => p.joinMafia(family)); // Re-run to update state properly
-            if (!success) setModal(null); // Close if rejected? Actually better to stay open or show toast. 
-            // simplify: let logEvent show result, we just rerender
+            runAction(p => {
+              const joined = p.joinMafia(family);
+              // If failed, maybe we alert? Log event handles it.
+              // We rely on log events.
+            });
           }}
           onAction={(action) => {
             runAction(p => p.performMafiaAction(action));
+          }}
+          onClose={() => setModal(null)}
+        />
+      )}
+
+      {modal === 'royalty' && (
+        <RoyaltyMenu
+          person={person}
+          onAction={(action) => {
+            runAction(p => {
+              if (action === 'public_service') p.performRoyalDuty();
+              if (action === 'abdicate') p.abdicate();
+              if (action === 'execute') p.executeSubject();
+              if (action === 'abdicate' || action === 'execute') setModal(null); // Close on big actions
+            });
           }}
           onClose={() => setModal(null)}
         />
@@ -504,6 +607,10 @@ function App() {
           onSell={(index) => {
             runAction(p => p.sellAsset(index));
           }}
+          onRent={(index, amount) => runAction(p => p.rentAsset(index, amount))}
+          onEvict={(index) => runAction(p => p.evictTenant(index))}
+          onInvest={(asset, amount) => runAction(p => p.buyInvestment(asset, amount))}
+          onDivest={(id) => runAction(p => p.sellInvestment(id))}
           onClose={() => setModal(null)}
         />
       )}
@@ -518,7 +625,7 @@ function App() {
       {modal === 'minigame_burglary' && (
         <MiniGameModal
           type="burglary"
-          difficulty={1} // Could scale with age or something
+          difficulty={modalData?.difficulty || 1} // Dynamic difficulty
           onResult={(success) => {
             setModal(null);
             runAction(p => p.commitCrime('burglary', success));
@@ -551,6 +658,7 @@ function App() {
         />
       )}
 
+
       {modal === 'doctor' && (
         <DoctorMenu
           person={person}
@@ -562,6 +670,54 @@ function App() {
             runAction(p => p.plasticSurgery(s));
             setModal(null);
           }}
+          onClose={() => setModal(null)}
+        />
+      )}
+
+      {modal === 'will' && (
+        <WillMenu
+          person={person}
+          onCreateWill={(beneficiary, allocations) => {
+            runAction(p => p.createWill(beneficiary, allocations));
+          }}
+          onClose={() => setModal(null)}
+        />
+      )}
+
+      {modal === 'hobbies' && (
+        <HobbiesMenu
+          person={person}
+          onPractice={(skillId) => {
+            runAction(p => p.practiceSkill(skillId));
+          }}
+          onClose={() => setModal(null)}
+        />
+
+      )}
+
+      {modal === 'pets' && (
+        <PetsMenu
+          person={person}
+          onInteract={(index, action) => {
+            runAction(p => p.interactWithPet(index, action));
+          }}
+          onAdopt={(pet) => {
+            runAction(p => p.adoptPet(pet));
+          }}
+          onClose={() => setModal(null)}
+        />
+      )}
+
+      {modal === 'stats' && (
+        <StatsMenu
+          stats={lifetimeStats.getStats()}
+          onClose={() => setModal(null)}
+        />
+      )}
+
+      {modal === 'familytree' && (
+        <FamilyTreeMenu
+          familyTree={familyTree}
           onClose={() => setModal(null)}
         />
       )}
@@ -584,11 +740,14 @@ function App() {
               const heir = person.inherit(child);
               // Ensure immediate save and state update
               setPerson(heir);
-              localStorage.setItem('bitlife_save', JSON.stringify(heir));
+              // Overwrite current slot? Or new one? Let's overwrite for continuity.
+              saveGameData(heir, currentSlotId);
             } else {
               // Clean Restart - Go back to Main Menu
-              localStorage.removeItem('bitlife_save');
+              // Maybe delete the save slot if they died and didn't inherit?
+              // For now, just clear person.
               setPerson(null);
+              setCurrentSlotId(null);
             }
           }}
         />

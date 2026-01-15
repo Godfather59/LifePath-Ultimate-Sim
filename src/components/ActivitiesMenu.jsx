@@ -14,6 +14,23 @@ export function ActivitiesMenu({ person, onDoActivity, onClose }) {
                 <div className="modal-body">
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '12px' }}>
 
+                        {/* Royalty */}
+                        {person.royalty && (
+                            <div
+                                className="list-item"
+                                onClick={() => onDoActivity({ isRoyalty: true })}
+                                style={{
+                                    cursor: 'pointer',
+                                    borderLeft: '3px solid gold',
+                                    background: 'linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(0,0,0,0.2) 100%)',
+                                    display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center'
+                                }}
+                            >
+                                <span style={{ fontSize: '1.5em', marginBottom: '8px' }}>👑</span>
+                                <span className="list-item-title">Royalty</span>
+                            </div>
+                        )}
+
                         {/* Social Media */}
                         <div
                             className="list-item"
@@ -110,6 +127,20 @@ export function ActivitiesMenu({ person, onDoActivity, onClose }) {
                         >
                             <span style={{ fontSize: '1.5em', marginBottom: '8px' }}>🎰</span>
                             <span className="list-item-title">Casino</span>
+                        </div>
+
+                        {/* Hobbies */}
+                        <div
+                            className="list-item"
+                            onClick={() => onDoActivity({ isHobbies: true })}
+                            style={{
+                                cursor: 'pointer',
+                                borderLeft: '3px solid #795548',
+                                display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center'
+                            }}
+                        >
+                            <span style={{ fontSize: '1.5em', marginBottom: '8px' }}>🎨</span>
+                            <span className="list-item-title">Hobbies</span>
                         </div>
                     </div>
 

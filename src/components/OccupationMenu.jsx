@@ -10,6 +10,15 @@ export function OccupationMenu({ person, onApply, onQuit, onClose }) {
         if (job.customReq === 'influencer') {
             if (!person.social?.isInfluencer) issues.push("Must be a Social Media Influencer");
         }
+        if (job.customReq === 'stuntman') {
+            if ((person.skills?.martialArts || 0) < 100) issues.push("Martial Arts Mastery (100)");
+        }
+        if (job.customReq === 'coding_skill') {
+            if ((person.skills?.coding || 0) < 80) issues.push("Coding Skill (80+)");
+        }
+        if (job.customReq === 'cooking_skill') {
+            if ((person.skills?.cooking || 0) < 90) issues.push("Cooking Skill (90+)");
+        }
 
         // Standard Requirements
         const req = job.requirements || {};
@@ -44,25 +53,44 @@ export function OccupationMenu({ person, onApply, onQuit, onClose }) {
                             🪖 Military Service
                         </h3>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                            {['Army', 'Navy', 'Air Force', 'Marines'].map(branch => (
-                                <button
-                                    key={branch}
-                                    className="list-item"
-                                    style={{
-                                        textAlign: 'center',
-                                        justifyContent: 'center',
-                                        padding: '16px',
-                                        background: 'linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))',
-                                        border: '1px solid rgba(255,255,255,0.1)',
-                                        cursor: 'pointer',
-                                        color: '#ddd',
-                                        fontWeight: '600'
-                                    }}
-                                    onClick={() => onApply({ isMilitary: true, branch })}
-                                >
-                                    {branch}
-                                </button>
-                            ))}
+                            {['Army', 'Navy', 'Air Force', 'Marines'].map(branch => {
+                                const branchInfo = { name: branch, id: branch.toLowerCase().replace(' ', '_') };
+                                return (
+                                    <div key={branch} style={{ display: 'flex', gap: '5px', flexDirection: 'column' }}>
+                                        <button
+                                            className="list-item"
+                                            style={{
+                                                textAlign: 'center',
+                                                padding: '12px',
+                                                background: 'rgba(255,255,255,0.05)',
+                                                border: '1px solid rgba(255,255,255,0.1)',
+                                                cursor: 'pointer',
+                                                color: '#ddd',
+                                                marginBottom: 0
+                                            }}
+                                            onClick={() => onApply({ isMilitary: true, branch: branchInfo, isOfficer: false })}
+                                        >
+                                            Enlist as Private
+                                        </button>
+                                        <button
+                                            className="list-item"
+                                            style={{
+                                                textAlign: 'center',
+                                                padding: '8px',
+                                                fontSize: '0.8rem',
+                                                background: 'rgba(255,215,0,0.1)',
+                                                border: '1px solid gold',
+                                                cursor: 'pointer',
+                                                color: 'gold',
+                                                marginTop: 0
+                                            }}
+                                            onClick={() => onApply({ isMilitary: true, branch: branchInfo, isOfficer: true })}
+                                        >
+                                            Officer (Degree Req)
+                                        </button>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
 
@@ -103,7 +131,7 @@ export function OccupationMenu({ person, onApply, onQuit, onClose }) {
                             </div>
                         ) : (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                {JOBS.map(job => {
+                                {(person.market?.jobs || JOBS).map(job => {
                                     const issues = checkRequirements(job);
                                     const qualified = issues.length === 0;
 

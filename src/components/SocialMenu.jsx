@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { SOCIAL_PLATFORMS, POST_TYPES } from '../logic/SocialMedia';
 import './Modal.css';
 
-export function SocialMenu({ person, onPost, onBuyFollowers, onClose }) {
+export function SocialMenu({ person, onPost, onMonetize, onBuyFollowers, onClose }) {
     const [selectedPlatform, setSelectedPlatform] = useState(null);
 
     // If no platform selected, show list
@@ -19,28 +19,35 @@ export function SocialMenu({ person, onPost, onBuyFollowers, onClose }) {
                             <div style={{ fontSize: '2rem', marginBottom: '8px' }}>📱</div>
                             <h3>Total Followers</h3>
                             <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--accent-primary)' }}>
-                                {person.social?.followers?.toLocaleString() || 0}
+                                {person.social.totalFollowers.toLocaleString()}
                             </div>
-                            {person.social?.isInfluencer && (
+                            {person.social.isInfluencer && (
                                 <div style={{ color: '#ffd700', marginTop: '5px' }}>⭐ Verified Influencer</div>
                             )}
                         </div>
 
                         <h3>Platforms</h3>
-                        {SOCIAL_PLATFORMS.map(platform => (
-                            <div
-                                key={platform.id}
-                                className="list-item"
-                                onClick={() => setSelectedPlatform(platform)}
-                                style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-                            >
-                                <div>
-                                    <div className="bold">{platform.name}</div>
-                                    <div className="list-item-subtitle">{platform.type.toUpperCase()} • {platform.audience} audience</div>
+                        {SOCIAL_PLATFORMS.map(platform => {
+                            const account = person.social.platforms[platform.id];
+                            const followers = account ? account.followers : 0;
+
+                            return (
+                                <div
+                                    key={platform.id}
+                                    className="list-item"
+                                    onClick={() => setSelectedPlatform(platform)}
+                                    style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                                >
+                                    <div>
+                                        <div className="bold">{platform.name}</div>
+                                        <div className="list-item-subtitle">
+                                            {followers.toLocaleString()} • {platform.audience}
+                                        </div>
+                                    </div>
+                                    <div>👉</div>
                                 </div>
-                                <div>👉</div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             </div>
@@ -48,6 +55,9 @@ export function SocialMenu({ person, onPost, onBuyFollowers, onClose }) {
     }
 
     // Platform Actions
+    const account = person.social.platforms[selectedPlatform.id] || { followers: 0 };
+    const canMonetize = account.followers >= 5000;
+
     return (
         <div className="modal-overlay">
             <div className="modal-content">
@@ -57,14 +67,29 @@ export function SocialMenu({ person, onPost, onBuyFollowers, onClose }) {
                 </div>
 
                 <div className="modal-body">
-                    <div style={{ marginBottom: '20px' }}>
+                    <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                        <div style={{ fontSize: '2em', fontWeight: 'bold' }}>{account.followers.toLocaleString()}</div>
+                        <div style={{ color: '#aaa' }}>Followers</div>
+                    </div>
+
+                    <div style={{ marginBottom: '20px', display: 'flex', gap: '8px' }}>
                         <button
-                            className="btn-secondary"
-                            style={{ marginBottom: '10px' }}
+                            className="btn-primary"
+                            style={{ flex: 1, background: '#4caf50' }}
                             onClick={() => onBuyFollowers(selectedPlatform)}
                         >
                             🤑 Buy Followers ($100)
                         </button>
+
+                        {canMonetize && (
+                            <button
+                                className="btn-primary"
+                                style={{ flex: 1, background: '#ff9800' }}
+                                onClick={() => onMonetize(selectedPlatform)}
+                            >
+                                🤝 Brand Deal
+                            </button>
+                        )}
                     </div>
 
                     <h3>Create a Post</h3>
@@ -76,12 +101,12 @@ export function SocialMenu({ person, onPost, onBuyFollowers, onClose }) {
                                 style={{ textAlign: 'left', width: '100%', cursor: 'pointer' }}
                                 onClick={() => {
                                     onPost(selectedPlatform, post);
-                                    // Optional: Close or stay? stay for now.
+                                    // Don't close, allow spamming
                                 }}
                             >
                                 <div className="bold">{post.title}</div>
                                 <div className="list-item-subtitle">
-                                    Risk: {post.risk}% | Viral Potential: {post.viral_chance}%
+                                    Risk: {post.risk}% | Viral: {post.viral_chance}%
                                 </div>
                             </button>
                         ))}

@@ -119,5 +119,22 @@ export const ACTIVITIES = [
         effects: { happiness: 30, stress: -20 },
         text: "You relaxed on a world cruise.",
         type: "good"
+    },
+    {
+        id: 'busk',
+        title: 'Street Performance (Busk)',
+        cost: 0,
+        text: "You found a spot on the street to perform.",
+        type: "neutral",
+        isBusking: true
+    },
+    {
+        id: 'estate_planning',
+        title: '📜 Estate Planning',
+        cost: 0,
+        effects: {},
+        text: "You planned your estate.",
+        type: "neutral",
+        isWill: true // Special flag for will menu
     }
 ];

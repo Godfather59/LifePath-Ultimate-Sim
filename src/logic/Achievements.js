@@ -58,6 +58,54 @@ export const ACHIEVEMENTS = [
         title: 'Cat Burglar',
         description: 'Successfully burgle a house.',
         icon: '💰'
+    },
+    {
+        id: 'born_royal',
+        title: 'Blue Blood',
+        description: 'Be born into Royalty.',
+        icon: '👑'
+    },
+    {
+        id: 'monarch',
+        title: 'Long Live the King/Queen',
+        description: 'Become the Monarch of your country.',
+        icon: '🏰'
+    },
+    {
+        id: 'tyrant',
+        title: 'Tyrant',
+        description: 'Execute a subject.',
+        icon: '☠️'
+    },
+    {
+        id: 'general',
+        title: 'Five Star General',
+        description: 'Reach the highest rank in the military.',
+        icon: '🎖️'
+    },
+    {
+        id: 'war_hero',
+        title: 'War Hero',
+        description: 'Survive a minefield deployment.',
+        icon: '💣'
+    },
+    {
+        id: 'made_man',
+        title: 'Made Man',
+        description: 'Join the Mafia.',
+        icon: '🌹'
+    },
+    {
+        id: 'godfather',
+        title: 'The Godfather',
+        description: 'Become the head of a Mafia family.',
+        icon: '🐴'
+    },
+    {
+        id: 'phd',
+        title: 'Academic',
+        description: 'Graduate from Graduate School.',
+        icon: '📜'
     }
 ];
 
@@ -91,6 +139,31 @@ export function checkAchievements(person, unlockedIds) {
 
     // Thief (history check for success)
     if (person.history.some(h => h.text.includes('successfully committed Burglary')) && !unlockedIds.includes('thief')) newUnlocks.push('thief');
+
+    // --- Royalty ---
+    if (person.royalty) {
+        if (person.history.some(h => h.text.includes('born a Prince') || h.text.includes('born a Princess')) && !unlockedIds.includes('born_royal')) newUnlocks.push('born_royal');
+
+        if ((person.royalty.title === 'King' || person.royalty.title === 'Queen') && !unlockedIds.includes('monarch')) newUnlocks.push('monarch');
+
+        if (person.history.some(h => h.text.includes('executed')) && !unlockedIds.includes('tyrant')) newUnlocks.push('tyrant');
+    }
+
+    // --- Military ---
+    if (person.job && person.job.isMilitary) {
+        if ((person.job.title.includes('General') || person.job.title.includes('Admiral')) && !unlockedIds.includes('general')) newUnlocks.push('general');
+    }
+    // War hero check needs history log of medal or survival
+    if (person.history.some(h => h.text.includes('survived the minefield')) && !unlockedIds.includes('war_hero')) newUnlocks.push('war_hero');
+
+    // --- Mafia ---
+    if (person.mafia) {
+        if (!unlockedIds.includes('made_man')) newUnlocks.push('made_man');
+        if (person.mafia.rank === 'Godfather' && !unlockedIds.includes('godfather')) newUnlocks.push('godfather');
+    }
+
+    // --- Education ---
+    if (person.educationHistory.some(e => ['Medical School', 'Law School', 'Business School'].some(s => e.includes(s))) && !unlockedIds.includes('phd')) newUnlocks.push('phd');
 
     return newUnlocks;
 }

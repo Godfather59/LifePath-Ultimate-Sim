@@ -16,11 +16,92 @@ export function RelationshipsMenu({ person, onInteract, onClose }) {
 
     const itemDisabled = (minAge) => person.age < minAge;
 
+    // Action Modal State
+    const [actionModal, setActionModal] = useState(null); // { type: 'propose'|'wedding'|'cheat', relId: string }
+    const [ringCost, setRingCost] = useState(2000);
+    const [weddingBudget, setWeddingBudget] = useState(5000);
+    const [prenup, setPrenup] = useState(false);
+
+    const handleActionClick = (type, relId) => {
+        setActionModal({ type, relId });
+        setRingCost(2000); // Reset defaults
+        setWeddingBudget(5000);
+        setPrenup(false);
+    };
+
+    const confirmAction = () => {
+        if (!actionModal) return;
+        const { type, relId } = actionModal;
+
+        let payload = {};
+        if (type === 'propose') {
+            payload = { ringCost };
+        } else if (type === 'wedding') {
+            payload = { budget: weddingBudget, prenup };
+        }
+
+        onInteract(relId, type === 'wedding' ? 'marry' : type, payload);
+        setActionModal(null);
+    };
+
     const StatBar = ({ value, color }) => (
         <div style={{ height: '6px', backgroundColor: '#333', borderRadius: '3px', marginTop: '4px', overflow: 'hidden' }}>
             <div style={{ width: `${value}%`, height: '100%', backgroundColor: color, transition: 'width 0.3s ease' }} />
         </div>
     );
+
+    const renderActionModal = () => {
+        if (!actionModal) return null;
+        const { type } = actionModal;
+        const rel = person.relationships.find(r => r.id === actionModal.relId);
+
+        return (
+            <div className="modal-overlay" style={{ zIndex: 200 }}>
+                <div className="modal-content" style={{ maxWidth: '300px' }}>
+                    <h3>{type === 'propose' ? 'Will you marry me?' : type === 'wedding' ? 'Plan Wedding' : 'Cheat'}</h3>
+
+                    {type === 'propose' && (
+                        <>
+                            <p>Select Ring Cost:</p>
+                            <select style={{ width: '100%', padding: '8px', marginBottom: '10px' }} value={ringCost} onChange={(e) => setRingCost(parseInt(e.target.value))}>
+                                <option value={100}>Plastic Ring ($100)</option>
+                                <option value={1000}>Silver Ring ($1,000)</option>
+                                <option value={2000}>Gold Ring ($2,000)</option>
+                                <option value={5000}>Diamond Ring ($5,000)</option>
+                                <option value={10000}>Huge Rock ($10,000)</option>
+                                <option value={50000}>Vintage Tiffany ($50,000)</option>
+                            </select>
+                        </>
+                    )}
+
+                    {type === 'wedding' && (
+                        <>
+                            <p>Wedding Budget:</p>
+                            <select style={{ width: '100%', padding: '8px', marginBottom: '10px' }} value={weddingBudget} onChange={(e) => setWeddingBudget(parseInt(e.target.value))}>
+                                <option value={100}>Courthouse ($100)</option>
+                                <option value={1000}>Backyard ($1,000)</option>
+                                <option value={5000}>Golf Course ($5,000)</option>
+                                <option value={20000}>Fancy Hotel ($20,000)</option>
+                                <option value={100000}>Castle ($100,000)</option>
+                            </select>
+                            <div style={{ marginBottom: '10px' }}>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <input type="checkbox" checked={prenup} onChange={(e) => setPrenup(e.target.checked)} />
+                                    Sign Prenup?
+                                </label>
+                                <div style={{ fontSize: '0.8em', color: '#aaa' }}>Protects assets, but may offend spouse.</div>
+                            </div>
+                        </>
+                    )}
+
+                    <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+                        <button className="btn-primary" onClick={confirmAction}>Confirm</button>
+                        <button className="btn-secondary" onClick={() => setActionModal(null)}>Cancel</button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="relationships-menu animate-fade-in" style={{
@@ -34,6 +115,7 @@ export function RelationshipsMenu({ person, onInteract, onClose }) {
             zIndex: 100,
             color: '#fff'
         }}>
+            {renderActionModal()}
             <div className="animate-slide-up" style={{
                 backgroundColor: '#1f1f1f',
                 borderRadius: '12px',
@@ -127,7 +209,7 @@ export function RelationshipsMenu({ person, onInteract, onClose }) {
                                                     alert("You are too young to marry!");
                                                     return;
                                                 }
-                                                onInteract(selectedRel.id, 'propose')
+                                                handleActionClick('propose', selectedRel.id);
                                             }}
                                             style={{
                                                 padding: '12px',
@@ -143,7 +225,7 @@ export function RelationshipsMenu({ person, onInteract, onClose }) {
                                     )}
                                     {selectedRel.type === 'Fiancé' && (
                                         <button
-                                            onClick={() => onInteract(selectedRel.id, 'marry')}
+                                            onClick={() => handleActionClick('wedding', selectedRel.id)}
                                             style={{
                                                 padding: '12px',
                                                 backgroundColor: '#ef6c00',
@@ -152,7 +234,21 @@ export function RelationshipsMenu({ person, onInteract, onClose }) {
                                                 border: 'none', borderRadius: '4px'
                                             }}
                                         >
-                                            💍 Plan Wedding ($5,000)
+                                            💍 Plan Wedding
+                                        </button>
+                                    )}
+                                    {(selectedRel.type === 'Partner' || selectedRel.type === 'Spouse' || selectedRel.type === 'Fiancé') && (
+                                        <button
+                                            onClick={() => onInteract(selectedRel.id, 'cheat')}
+                                            style={{
+                                                padding: '12px',
+                                                backgroundColor: '#4a148c',
+                                                color: 'white',
+                                                border: 'none', borderRadius: '4px',
+                                                cursor: 'pointer'
+                                            }}
+                                        >
+                                            😈 Cheat
                                         </button>
                                     )}
 

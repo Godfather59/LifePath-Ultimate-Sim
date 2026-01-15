@@ -4,8 +4,8 @@
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--glass-border);
-    padding: 16px;
-    padding-top: max(50px, env(safe-area-inset-top));
+    padding: 12px;
+    padding-top: max(40px, env(safe-area-inset-top));
     /* Push down from Status Bar */
 
     /* Fixed Positioning */
@@ -23,9 +23,8 @@
 .hud-header {
     display: flex;
     align-items: center;
-    gap: 16px;
-    gap: 16px;
-    margin-bottom: 20px;
+    gap: 12px;
+    margin-bottom: 12px;
     position: relative;
     /* For absolute positioning of settings button */
 }
@@ -55,8 +54,8 @@
 }
 
 .avatar-circle {
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     background: linear-gradient(135deg, #ddd, #fff);
     border: 3px solid rgba(255, 255, 255, 0.2);
@@ -103,7 +102,7 @@
 .stat-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px 20px;
+    gap: 8px 16px;
 }
 
 .stat-row {

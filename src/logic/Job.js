@@ -19,7 +19,7 @@ export const JOBS = [
         id: 'teacher',
         title: 'School Teacher',
         salary: 45000,
-        requirements: { smarts: 60, education: 'University' },
+        requirements: { smarts: 60, education: 'University', degree_req: ['Education', 'English', 'Mathematics', 'History'] },
         stress: 40,
         careerPath: 'education'
     },
@@ -27,7 +27,7 @@ export const JOBS = [
         id: 'engineer',
         title: 'Jr. Software Engineer',
         salary: 60000,
-        requirements: { smarts: 80, education: 'University' },
+        requirements: { smarts: 80, education: 'University', degree_req: ['Computer Science'] },
         stress: 50,
         careerPath: 'tech'
     },
@@ -59,7 +59,7 @@ export const JOBS = [
         id: 'lawyer',
         title: 'Jr. Associate Lawyer',
         salary: 90000,
-        requirements: { smarts: 90, education: 'University' },
+        requirements: { smarts: 90, education: 'Law School' },
         stress: 85,
         careerPath: 'legal'
     },
@@ -113,6 +113,206 @@ export const JOBS = [
         requirements: { looks: 80, education: 'None' },
         customReq: 'influencer',
         stress: 65
+    },
+    {
+        id: 'stuntman',
+        title: 'Stuntman',
+        salary: 80000,
+        requirements: { health: 90, education: 'None' },
+        customReq: 'stuntman',
+        stress: 85
+    },
+    {
+        id: 'app_dev',
+        title: 'App Developer',
+        salary: 90000,
+        requirements: { smarts: 70, education: 'None' },
+        customReq: 'coding_skill',
+        stress: 40
+    },
+    {
+        id: 'head_chef',
+        title: 'Head Chef',
+        salary: 85000,
+        requirements: { smarts: 50, education: 'None' },
+        customReq: 'cooking_skill',
+        stress: 80 // Kitchens are stressful
+    },
+    // --- NEW CAREERS ---
+    {
+        id: 'veterinarian',
+        title: 'Veterinarian',
+        salary: 95000,
+        requirements: { smarts: 75, education: 'University', degree_req: ['Biology', 'Veterinary Medicine'] },
+        stress: 50
+    },
+    {
+        id: 'architect',
+        title: 'Architect',
+        salary: 85000,
+        requirements: { smarts: 70, education: 'University', degree_req: ['Architecture', 'Engineering'] },
+        stress: 60
+    },
+    {
+        id: 'pharmacist',
+        title: 'Pharmacist',
+        salary: 120000,
+        requirements: { smarts: 80, education: 'University', degree_req: ['Pharmacy', 'Chemistry'] },
+        stress: 40
+    },
+    {
+        id: 'physical_therapist',
+        title: 'Physical Therapist',
+        salary: 75000,
+        requirements: { smarts: 65, education: 'University', degree_req: ['Physical Therapy', 'Biology'] },
+        stress: 35
+    },
+    {
+        id: 'electrical_engineer',
+        title: 'Electrical Engineer',
+        salary: 95000,
+        requirements: { smarts: 75, education: 'University', degree_req: ['Engineering', 'Electrical Engineering'] },
+        stress: 65
+    },
+    {
+        id: 'data_scientist',
+        title: 'Data Scientist',
+        salary: 125000,
+        requirements: { smarts: 85, education: 'University', degree_req: ['Computer Science', 'Mathematics', 'Statistics'] },
+        stress: 60
+    },
+    {
+        id: 'marketing_manager',
+        title: 'Marketing Manager',
+        salary: 90000,
+        requirements: { smarts: 65, looks: 60, education: 'University', degree_req: ['Business', 'Marketing'] },
+        stress: 70
+    },
+    {
+        id: 'financial_analyst',
+        title: 'Financial Analyst',
+        salary: 80000,
+        requirements: { smarts: 75, education: 'University', degree_req: ['Finance', 'Economics', 'Business'] },
+        stress: 75
+    },
+    {
+        id: 'psychologist',
+        title: 'Psychologist',
+        salary: 85000,
+        requirements: { smarts: 70, education: 'Graduate School', degree_req: ['Psychology'] },
+        stress: 55
+    },
+    {
+        id: 'real_estate_agent',
+        title: 'Real Estate Agent',
+        salary: 65000,
+        requirements: { looks: 65, smarts: 50, education: 'High School' },
+        stress: 60
+    },
+    {
+        id: 'firefighter',
+        title: 'Firefighter',
+        salary: 55000,
+        requirements: { health: 85, smarts: 40, education: 'High School' },
+        stress: 85
+    },
+    {
+        id: 'paramedic',
+        title: 'Paramedic',
+        salary: 48000,
+        requirements: { health: 75, smarts: 60, education: 'High School' },
+        stress: 90
+    },
+    {
+        id: 'dental_hygienist',
+        title: 'Dental Hygienist',
+        salary: 70000,
+        requirements: { smarts: 60, education: 'High School' },
+        stress: 35
+    },
+    {
+        id: 'graphic_designer',
+        title: 'Graphic Designer',
+        salary: 55000,
+        requirements: { smarts: 55, looks: 50, education: 'High School' },
+        stress: 45
+    },
+    {
+        id: 'web_developer',
+        title: 'Web Developer',
+        salary: 75000,
+        requirements: { smarts: 70, education: 'High School', customReq: 'coding_skill' },
+        stress: 50
+    },
+    {
+        id: 'plumber',
+        title: 'Plumber',
+        salary: 60000,
+        requirements: { health: 65, smarts: 40, education: 'High School' },
+        stress: 55
+    },
+    {
+        id: 'electrician',
+        title: 'Electrician',
+        salary: 65000,
+        requirements: { health: 65, smarts: 55, education: 'High School' },
+        stress: 60
+    },
+    {
+        id: 'hair_stylist',
+        title: 'Hair Stylist',
+        salary: 45000,
+        requirements: { looks: 55, smarts: 35, education: 'High School' },
+        stress: 30
+    },
+    {
+        id: 'truck_driver',
+        title: 'Truck Driver',
+        salary: 50000,
+        requirements: { health: 60, education: 'High School' },
+        stress: 40
+    },
+    {
+        id: 'flight_attendant',
+        title: 'Flight Attendant',
+        salary: 55000,
+        requirements: { looks: 70, health: 65, education: 'High School' },
+        stress: 60
+    },
+    {
+        id: 'journalist',
+        title: 'Journalist',
+        salary: 52000,
+        requirements: { smarts: 70, education: 'University', degree_req: ['Journalism', 'English'] },
+        stress: 70
+    },
+    {
+        id: 'librarian',
+        title: 'Librarian',
+        salary: 48000,
+        requirements: { smarts: 60, education: 'University' },
+        stress: 20
+    },
+    {
+        id: 'social_worker',
+        title: 'Social Worker',
+        salary: 50000,
+        requirements: { smarts: 65, education: 'University', degree_req: ['Social Work', 'Psychology'] },
+        stress: 75
+    },
+    {
+        id: 'personal_trainer',
+        title: 'Personal Trainer',
+        salary: 45000,
+        requirements: { health: 80, looks: 65, education: 'High School' },
+        stress: 30
+    },
+    {
+        id: 'photographer',
+        title: 'Photographer',
+        salary: 52000,
+        requirements: { looks: 50, smarts: 55, education: 'High School' },
+        stress: 35
     }
 ];
 
@@ -173,7 +373,7 @@ export const EDUCATION_LEVELS = [
 ];
 
 // Returns logic results to be logged by GameEngine
-export function evaluateJobPerformance(person) {
+export function evaluateJobPerformance(person, economy = 'Normal') {
     if (!person.job || person.job.isMilitary || person.job.isPolitical) return null;
 
     const job = person.job;
@@ -238,7 +438,18 @@ export function evaluateJobPerformance(person) {
         }
     }
 
-    // 4. Firing Check
+    // 4. Layoff Check (Recession)
+    if (economy === 'Recession' && Math.random() < 0.15) {
+        events.push({
+            type: 'bad',
+            text: `You were laid off from your job as ${job.title} due to budget cuts during the Recession.`
+        });
+        person.quitJob(); // remove job
+        person.updateStats({ happiness: -20, stress: 20 });
+        return events; // Stop processing
+    }
+
+    // 5. Firing Check (Performance)
     if (job.performance < 15 && Math.random() < 0.2) {
         events.push({
             type: 'bad',
