@@ -498,8 +498,8 @@ function App() {
       {modal === 'assets' && (
         <AssetsMenu
           person={person}
-          onBuy={(asset) => {
-            runAction(p => p.buyAsset(asset));
+          onBuy={(asset, mortgage) => {
+            runAction(p => p.buyAsset(asset, mortgage));
           }}
           onSell={(index) => {
             runAction(p => p.sellAsset(index));

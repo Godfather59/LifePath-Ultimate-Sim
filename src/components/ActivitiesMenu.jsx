@@ -5,86 +5,141 @@ import './Modal.css';
 export function ActivitiesMenu({ person, onDoActivity, onClose }) {
     return (
         <div className="modal-overlay">
-            <div className="modal-content">
+            <div className="modal-content" style={{ maxWidth: '500px' }}>
                 <div className="modal-header">
                     <h2 className="modal-title">Activities</h2>
                     <button className="close-btn" onClick={onClose}>&times;</button>
                 </div>
 
                 <div className="modal-body">
-                    {/* Social Media Button */}
-                    <div
-                        className="list-item"
-                        onClick={() => onDoActivity({ isSocial: true })}
-                        style={{ cursor: 'pointer' }}
-                    >
-                        <span className="list-item-title">📱 Social Media</span>
-                        <span className="list-item-subtitle">Manage your BitBook, TokTik, etc.</span>
-                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '12px' }}>
 
-                    {/* Music Activities */}
-                    <div className="list-item" onClick={() => onDoActivity({ isMusic: true })} style={{ cursor: 'pointer', background: 'rgba(233, 30, 99, 0.1)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span className="list-item-title">🎵 Music & Instruments</span>
-                            <span>$0</span>
-                        </div>
-                        <span className="list-item-subtitle">Practice instrument or take voice lessons.</span>
-                    </div>
-
-                    {/* Standard Activities */}
-                    {ACTIVITIES.map((act, idx) => (
+                        {/* Social Media */}
                         <div
-                            key={idx}
                             className="list-item"
-                            onClick={() => {
-                                if (act.isDating) {
-                                    onDoActivity({ isLove: true });
-                                } else {
-                                    onDoActivity(act);
-                                }
+                            onClick={() => onDoActivity({ isSocial: true })}
+                            style={{
+                                cursor: 'pointer',
+                                borderLeft: '3px solid #03a9f4',
+                                display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center'
                             }}
-                            style={{ cursor: 'pointer' }}
                         >
-                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <span className="list-item-title">{act.title}</span>
-                                <span style={{ color: 'var(--success-color)' }}>{act.cost > 0 ? `$${act.cost}` : 'Free'}</span>
-                            </div>
-                            <span className="list-item-subtitle">
-                                {act.type === 'good' ? 'Boost Happiness/Health' : 'Risky Business'}
-                            </span>
+                            <span style={{ fontSize: '1.5em', marginBottom: '8px' }}>📱</span>
+                            <span className="list-item-title">Social Media</span>
                         </div>
-                    ))}
 
-                    {/* Mafia Activity */}
-                    <div className="list-item" onClick={() => onDoActivity({ isMafia: true })} style={{ cursor: 'pointer', background: '#212121', color: '#fff' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span className="list-item-title">🕵️‍♂️ Organized Crime</span>
+                        {/* Love */}
+                        <div
+                            className="list-item"
+                            onClick={() => onDoActivity({ isLove: true })}
+                            style={{
+                                cursor: 'pointer',
+                                borderLeft: '3px solid #e91e63',
+                                display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center'
+                            }}
+                        >
+                            <span style={{ fontSize: '1.5em', marginBottom: '8px' }}>💘</span>
+                            <span className="list-item-title">Love</span>
                         </div>
-                        <span className="list-item-subtitle" style={{ color: '#aaa' }}>Join the family.</span>
+
+                        {/* Music */}
+                        <div
+                            className="list-item"
+                            onClick={() => onDoActivity({ isMusic: true })}
+                            style={{
+                                cursor: 'pointer',
+                                borderLeft: '3px solid #9c27b0',
+                                display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center'
+                            }}
+                        >
+                            <span style={{ fontSize: '1.5em', marginBottom: '8px' }}>🎵</span>
+                            <span className="list-item-title">Instruments</span>
+                        </div>
+
+                        {/* Doctor */}
+                        <div
+                            className="list-item"
+                            onClick={() => onDoActivity({ isDoctor: true })}
+                            style={{
+                                cursor: 'pointer',
+                                borderLeft: '3px solid #00e676',
+                                display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center'
+                            }}
+                        >
+                            <span style={{ fontSize: '1.5em', marginBottom: '8px' }}>🩺</span>
+                            <span className="list-item-title">Doctor</span>
+                        </div>
+
+                        {/* Politics */}
+                        <div
+                            className="list-item"
+                            onClick={() => onDoActivity({ isPolitics: true })}
+                            style={{
+                                cursor: 'pointer',
+                                borderLeft: '3px solid #1e88e5',
+                                display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center'
+                            }}
+                        >
+                            <span style={{ fontSize: '1.5em', marginBottom: '8px' }}>🗳️</span>
+                            <span className="list-item-title">Politics</span>
+                        </div>
+
+                        {/* Mafia */}
+                        <div
+                            className="list-item"
+                            onClick={() => onDoActivity({ isMafia: true })}
+                            style={{
+                                cursor: 'pointer',
+                                borderLeft: '3px solid #333',
+                                display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center'
+                            }}
+                        >
+                            <span style={{ fontSize: '1.5em', marginBottom: '8px' }}>🕵️‍♂️</span>
+                            <span className="list-item-title">Crime</span>
+                        </div>
+
+                        {/* Casino */}
+                        <div
+                            className="list-item"
+                            onClick={() => onDoActivity({ isGambling: true })}
+                            style={{
+                                cursor: 'pointer',
+                                borderLeft: '3px solid #ffb300',
+                                display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center'
+                            }}
+                        >
+                            <span style={{ fontSize: '1.5em', marginBottom: '8px' }}>🎰</span>
+                            <span className="list-item-title">Casino</span>
+                        </div>
                     </div>
 
-                    {/* Politics Button */}
-                    <div className="list-item" onClick={() => onDoActivity({ isPolitics: true })} style={{ cursor: 'pointer', background: 'linear-gradient(135deg, #1e88e5, #1565c0)', color: '#fff' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span className="list-item-title">🏛️ Politics</span>
-                        </div>
-                        <span className="list-item-subtitle" style={{ color: '#eee' }}>Run for office.</span>
-                    </div>
+                    <h3 style={{ fontSize: '0.8rem', color: '#666', textTransform: 'uppercase', letterSpacing: '1px', marginTop: '20px', marginBottom: '10px' }}>
+                        More Activities
+                    </h3>
 
-                    {/* Casino Button */}
-                    <div className="list-item" onClick={() => onDoActivity({ isGambling: true })} style={{ cursor: 'pointer', background: 'linear-gradient(135deg, #ffd700, #ff8f00)', color: '#000' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span className="list-item-title">🎰 Casino</span>
-                        </div>
-                        <span className="list-item-subtitle" style={{ color: '#333' }}>Feeling lucky?</span>
-                    </div>
-
-                    {/* Doctor Button */}
-                    <div className="list-item" onClick={() => onDoActivity({ isDoctor: true })} style={{ cursor: 'pointer', background: 'linear-gradient(135deg, #00e676, #00b09b)', color: '#fff' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span className="list-item-title">💉 Doctor & Surgery</span>
-                        </div>
-                        <span className="list-item-subtitle" style={{ color: '#eee' }}>Stay healthy... or pretty.</span>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '8px' }}>
+                        {ACTIVITIES.map((act, idx) => (
+                            !act.isDating && !act.isSocial && !act.isMusic && !act.isMafia && !act.isPolitics && !act.isGambling && !act.isDoctor && (
+                                <div
+                                    key={idx}
+                                    className="list-item"
+                                    onClick={() => onDoActivity(act)}
+                                    style={{
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                        padding: '12px 16px',
+                                        marginBottom: 0
+                                    }}
+                                >
+                                    <span className="list-item-title" style={{ margin: 0 }}>{act.title}</span>
+                                    <span style={{ color: act.cost > 0 ? '#ffb74d' : '#81c784', fontSize: '0.9em', background: 'rgba(0,0,0,0.2)', padding: '4px 8px', borderRadius: '4px' }}>
+                                        {act.cost > 0 ? `$${act.cost}` : 'Free'}
+                                    </span>
+                                </div>
+                            )
+                        ))}
                     </div>
                 </div>
             </div>

@@ -52,6 +52,16 @@ export function GameOver({ person, onRestart }) {
                     <span>Children:</span>
                     <span>{person.relationships.filter(r => r.type === 'Child').length}</span>
                 </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <span>Karma:</span>
+                    <span style={{ color: person.karma > 50 ? '#4caf50' : '#f44336' }}>{person.karma}/100</span>
+                </div>
+                {person.fame > 0 && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                        <span>Fame:</span>
+                        <span style={{ color: '#ffd700' }}>{person.fame}%</span>
+                    </div>
+                )}
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span>Partners:</span>
                     <span>{person.history.filter(h => h.text.includes('started dating')).length}</span>

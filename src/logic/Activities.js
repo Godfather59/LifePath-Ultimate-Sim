@@ -3,7 +3,7 @@ export const ACTIVITIES = [
         id: 'gym',
         title: 'Go to the Gym',
         cost: 50,
-        effects: { health: 2, looks: 1, happiness: 1 },
+        effects: { health: 2, looks: 1, happiness: 1, stress: -5 },
         text: "You worked out at the gym.",
         type: "good"
     },
@@ -11,7 +11,7 @@ export const ACTIVITIES = [
         id: 'meditate',
         title: 'Meditate',
         cost: 0,
-        effects: { happiness: 3, health: 1 },
+        effects: { happiness: 3, health: 1, stress: -10 },
         text: "You meditated and found inner peace.",
         type: "good"
     },
@@ -27,7 +27,7 @@ export const ACTIVITIES = [
         id: 'club',
         title: 'Go Clubbing',
         cost: 100,
-        effects: { happiness: 5, health: -1 },
+        effects: { happiness: 5, health: -1, stress: -5 },
         text: "You danced all night at the club!",
         type: "good"
     },
@@ -56,7 +56,8 @@ export const ACTIVITIES = [
         text: "You are attempting to break into a house...",
         type: "neutral",
         isCrime: true,
-        crimeType: 'burglary'
+        crimeType: 'burglary',
+        effects: { stress: 10, karma: -10 }
     },
     {
         id: 'commit_crime_robbery',
@@ -66,7 +67,8 @@ export const ACTIVITIES = [
         text: "You are attempting to rob a bank! HIGH RISK.",
         type: "neutral",
         isCrime: true,
-        crimeType: 'robbery'
+        crimeType: 'robbery',
+        effects: { stress: 50, karma: -30 }
     },
     {
         id: 'gamble_lottery',
@@ -90,7 +92,7 @@ export const ACTIVITIES = [
         id: 'adopt_pet_dog',
         title: 'Adopt a Dog',
         cost: 500,
-        effects: { happiness: 20, health: 2 },
+        effects: { happiness: 20, health: 2, karma: 5, stress: -5 },
         text: "You adopted a playful puppy!",
         type: "good"
     },
@@ -98,7 +100,7 @@ export const ACTIVITIES = [
         id: 'adopt_pet_cat',
         title: 'Adopt a Cat',
         cost: 200,
-        effects: { happiness: 15, stress: -5 },
+        effects: { happiness: 15, stress: -5, karma: 5 },
         text: "You adopted a cute kitten.",
         type: "good"
     },

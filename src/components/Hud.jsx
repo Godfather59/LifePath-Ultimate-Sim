@@ -68,6 +68,9 @@ export function Hud({ person, onOpenMenu }) {
                 <StatBar label="Health" value={person.health} type="health" />
                 <StatBar label="Smarts" value={person.smarts} type="smarts" />
                 <StatBar label="Looks" value={person.looks} type="looks" />
+                <StatBar label="Stress" value={person.stress} type="stress" />
+                <StatBar label="Karma" value={person.karma} type="karma" />
+                {person.fame > 0 && <StatBar label="Fame" value={person.fame} type="fame" />}
             </div>
         </div>
     );

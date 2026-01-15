@@ -1,4 +1,6 @@
-import { LIFE_EVENTS } from './Events';
+import { LIFE_EVENTS, CAREER_EVENTS } from './Events';
+import { evaluateJobPerformance } from './Job';
+import { AssetMarket } from './Assets';
 
 export class GameEngine {
     static ageUp(person) {
@@ -6,6 +8,9 @@ export class GameEngine {
 
         person.age++;
         person.history = person.history.slice(0, 49); // Keep log manageable
+
+        // Generate Market for the new year
+        this.generateYearlyMarket(person);
 
         // Prison Logic
         if (person.isInPrison) {
@@ -26,8 +31,9 @@ export class GameEngine {
 
         // Natural stat decay/growth
         this.processNaturalChanges(person);
+        this.processStatConsequences(person);
 
-        // Asset Maintenance
+        // Asset Maintenance (and Mortgages)
         this.processAssets(person);
 
         // Education Progress
@@ -69,6 +75,41 @@ export class GameEngine {
         // Happiness reverts to baseline? or just random fluctuation
         const moodSwing = Math.floor(Math.random() * 5) - 2;
         person.updateStats({ happiness: moodSwing });
+        person.updateStats({ happiness: moodSwing });
+    }
+
+    static processStatConsequences(person) {
+        // --- STRESS ---
+        if (person.stress > 80) {
+            person.updateStats({ health: -5, happiness: -5 });
+            if (Math.random() < 0.2) { // 20% chance of warning sig
+                person.logEvent("You are suffering from high blood pressure due to stress.", "bad");
+            }
+            if (Math.random() < 0.02) { // 2% chance of Heart Attack
+                person.logEvent("You had a massive HEART ATTACK due to extreme stress!", "bad");
+                person.updateStats({ health: -50 });
+            }
+        }
+
+        // --- KARMA ---
+        if (person.karma > 90 && Math.random() < 0.1) {
+            person.logEvent("Good Karma! You found a diamond ring on the floor.", "good");
+            person.updateStats({ money: 2000, happiness: 10 });
+        } else if (person.karma < 10 && Math.random() < 0.1) {
+            person.logEvent("Bad Karma! A bird pooped on your head.", "bad");
+            person.updateStats({ happiness: -10 });
+        }
+
+        // --- FAME ---
+        if (person.fame > 50 && Math.random() < 0.1) {
+            const fanInteractions = [
+                { text: "A fan asked for your autograph!", type: "good", effect: { happiness: 5 } },
+                { text: "A fan was stalking you...", type: "bad", effect: { stress: 10 } }
+            ];
+            const interaction = fanInteractions[Math.floor(Math.random() * fanInteractions.length)];
+            person.logEvent(interaction.text, interaction.type);
+            person.updateStats(interaction.effect);
+        }
     }
 
     static processCareer(person) {
@@ -78,7 +119,13 @@ export class GameEngine {
             person.updateStats({ money: netIncome });
             person.job.yearsEmployed++;
 
-            // Random raise or promotion logic could go here
+            // Performance Evaluation (Raises, Promotions, Firing)
+            const careerEvents = evaluateJobPerformance(person);
+            if (careerEvents && careerEvents.length > 0) {
+                careerEvents.forEach(evt => {
+                    person.logEvent(evt.text, evt.type);
+                });
+            }
         }
     }
 
@@ -86,10 +133,28 @@ export class GameEngine {
         if (person.assets.length === 0) return;
 
         let totalMaintenance = 0;
+        let totalMortgage = 0;
         const messages = [];
 
         person.assets.forEach(asset => {
             totalMaintenance += asset.maintenance;
+
+            // Mortgage Logic
+            if (asset.isMortgaged && asset.mortgage) {
+                const annualPayment = asset.mortgage.monthlyPayment * 12;
+                totalMortgage += annualPayment;
+
+                // Reduce balance
+                // Simplified interest: Interest is already baked into the fixed payment or ignored for MVP simplicity
+                // Let's just reduce balance by principal roughly
+                asset.mortgage.balance -= annualPayment;
+
+                if (asset.mortgage.balance <= 0) {
+                    asset.isMortgaged = false;
+                    asset.mortgage = null;
+                    messages.push(`You paid off your mortgage on the ${asset.name}!`);
+                }
+            }
 
             // Age the asset
             asset.age = (asset.age || 0) + 1;
@@ -131,10 +196,27 @@ export class GameEngine {
             // person.logEvent(`You paid $${totalMaintenance.toLocaleString()} in asset maintenance.`); 
         }
 
+        if (totalMortgage > 0) {
+            person.money -= totalMortgage;
+            // messages.push(`You paid $${totalMortgage.toLocaleString()} in mortgage payments.`);
+        }
+
         if (messages.length > 0) {
             // Pick one significant event to log to avoid spam
             person.logEvent(messages[0]);
         }
+    }
+
+    static generateYearlyMarket(person) {
+        // Generate new market listings for the year
+        // We import AssetMarket here or assume it's available contextually
+        // Since we need to import it, let's add the import to the top of file later
+        // For now, let's assume `AssetMarket` is imported
+
+        person.market = {
+            realEstate: AssetMarket.generateRealEstateListings(5),
+            cars: AssetMarket.generateCarListings(6)
+        };
     }
 
     static processEducation(person) {
@@ -185,8 +267,21 @@ export class GameEngine {
     }
 
     static generateEvent(person) {
-        // Filter applicable events
-        const possibleEvents = LIFE_EVENTS.filter(e => e.trigger(person));
+        // Collect all possible events
+        let possibleEvents = LIFE_EVENTS.filter(e => e.trigger(person));
+
+        // Add Career Events (Higher weight? Or just mix them in)
+        const careerEvents = CAREER_EVENTS.filter(e => e.trigger(person));
+
+        // If there are career events, let's make them highly likely to occur to ensure flavor
+        if (careerEvents.length > 0) {
+            // 50% chance to pick a career event if available
+            if (Math.random() < 0.5) {
+                return careerEvents[Math.floor(Math.random() * careerEvents.length)];
+            }
+            // Otherwise mix them into the general pool
+            possibleEvents = [...possibleEvents, ...careerEvents];
+        }
 
         if (possibleEvents.length === 0) return null;
 
@@ -211,5 +306,8 @@ export class GameEngine {
             type: 'Mother',
             age: 20 + Math.floor(Math.random() * 20)
         });
+
+        // Initial Market
+        this.generateYearlyMarket(person);
     }
 }

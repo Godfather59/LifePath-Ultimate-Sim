@@ -13,6 +13,14 @@ export class Person {
     this.health = this.randomStat(90, 100);
     this.smarts = this.randomStat(20, 80);
     this.looks = this.randomStat(20, 80);
+    this.stress = 0; // 0-100
+    this.karma = 50; // 0-100
+    this.fame = 0; // 0-100
+
+    this.skills = {
+      voice: 0,
+      instruments: {}
+    };
 
     this.isAlive = true;
     this.job = null; // { title, salary, performance }
@@ -71,6 +79,9 @@ export class Person {
     if (changes.smarts) this.smarts = this.clamp(this.smarts + changes.smarts);
     if (changes.looks) this.looks = this.clamp(this.looks + changes.looks);
     if (changes.money) this.money += changes.money; // Money isn't clamped to 100
+    if (changes.stress) this.stress = this.clamp(this.stress + changes.stress);
+    if (changes.karma) this.karma = this.clamp(this.karma + changes.karma);
+    if (changes.fame) this.fame = this.clamp(this.fame + changes.fame);
   }
 
 
@@ -163,20 +174,37 @@ export class Person {
     this.pendingEvent = null;
   }
 
-  buyAsset(asset) {
-    if (this.money < asset.price) {
-      this.logEvent(`You cannot afford the ${asset.name}.`, "bad");
+  buyAsset(asset, mortgage = null) {
+    const cost = mortgage ? mortgage.downPayment : asset.price;
+
+    if (this.money < cost) {
+      this.logEvent(`You cannot afford the ${mortgage ? 'down payment' : 'price'} for the ${asset.name}.`, "bad");
       return false;
     }
 
-    this.money -= asset.price;
-    this.assets.push({
+    this.money -= cost;
+
+    const newAsset = {
       ...asset,
       purchasePrice: asset.price,
       value: asset.value || asset.price // Set initial value for appreciation tracking
-    });
+    };
+
+    if (mortgage) {
+      newAsset.isMortgaged = true;
+      newAsset.mortgage = {
+        amount: mortgage.amount, // Total loan amount
+        balance: mortgage.amount, // Remaining balance
+        monthlyPayment: mortgage.monthlyPayment,
+        term: mortgage.term // Years
+      };
+      this.logEvent(`You bought a ${asset.name} with a mortgage! Down payment: $${cost.toLocaleString()}.`, "good");
+    } else {
+      this.logEvent(`You bought a ${asset.name} for $${asset.price.toLocaleString()} cash!`, "good");
+    }
+
+    this.assets.push(newAsset);
     this.updateStats({ happiness: asset.happiness_bonus || 10 }); // Default bonus
-    this.logEvent(`You bought a ${asset.name} for $${asset.price.toLocaleString()}!`, "good");
     return true;
   }
 
@@ -218,9 +246,21 @@ export class Person {
         type = "good";
         break;
       case 'compliment':
-        text = `You complimented your ${rel.type}, ${rel.name}.`;
-        change = 8;
-        type = "good";
+        // Realism: 25% chance of being ignored or annoyed
+        if (Math.random() < 0.25) {
+          const replies = [
+            `${rel.name} ignored you.`,
+            `${rel.name} asked, "What do you want?"`,
+            `${rel.name} told you to stop sucking up.`
+          ];
+          text = replies[Math.floor(Math.random() * replies.length)];
+          change = -2;
+          type = "neutral";
+        } else {
+          text = `You complimented your ${rel.type}, ${rel.name}.`;
+          change = 8;
+          type = "good";
+        }
         break;
       case 'insult':
         text = `You insulted your ${rel.type}, ${rel.name}!`;
@@ -339,12 +379,36 @@ export class Person {
   studyHard() {
     if (!this.currentSchool) return;
 
+    // Burnout Check
+    // If stress is already high (e.g., > 70), there's a risk
+    const currentStress = this.stats?.stress || 0; // accessing generic stats if stored differently? 
+    // Wait, Person.js stores stress implicitly in updateStats? No, I don't see `this.stress` in constructor. 
+    // Let's check constructor.
+    // It seems `this.stress` wasn't explicitly initialized in constructor in the visible snippet, 
+    // but `Job.js` logic uses it. Let's assume it exists or init it.
+    // Actually, `updateStats` doesn't seem to clamp stress or even have a this.stress field in the visible snippet lines 1-160.
+    // I should probably ensure `this.stress` exists.
+
+    // Quick fix: Add this.stress if missing
+    if (this.stress === undefined) this.stress = 0;
+
+    if (this.stress > 70 && Math.random() < 0.3) {
+      this.logEvent("You suffered from burnout while trying to study!", "bad");
+      this.updateStats({ health: -5, happiness: -5 });
+      this.stress = Math.min(100, this.stress + 10);
+      return;
+    }
+
     // Performance gain
     this.currentSchool.performance = (this.currentSchool.performance || 50) + 10;
     if (this.currentSchool.performance > 100) this.currentSchool.performance = 100;
 
     // Smarts gain
-    this.updateStats({ smarts: 2, stress: 5 });
+    this.updateStats({ smarts: 2 });
+
+    // Stress gain
+    this.stress = Math.min(100, this.stress + 10);
+
     this.logEvent("You studied hard for your classes.", "good");
   }
 

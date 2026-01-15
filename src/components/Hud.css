@@ -1,10 +1,11 @@
+/* HUD Styles */
 .hud-container {
     background: rgba(30, 30, 46, 0.95);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--glass-border);
     padding: 16px;
-    padding-top: max(16px, env(safe-area-inset-top));
+    padding-top: max(50px, env(safe-area-inset-top));
     /* Push down from Status Bar */
 
     /* Fixed Positioning */
@@ -31,8 +32,8 @@
 
 .settings-btn {
     position: absolute;
-    top: -8px;
-    right: -8px;
+    top: 0px;
+    right: 0px;
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 50%;
@@ -88,6 +89,7 @@
     margin: 0;
     letter-spacing: 0.5px;
     background: linear-gradient(to right, #fff, #ccc);
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -152,4 +154,16 @@
 
 .fill-looks {
     background: linear-gradient(90deg, #f093fb, #f5576c);
+}
+
+.fill-stress {
+    background: linear-gradient(90deg, #ffdd00, #ff0000);
+}
+
+.fill-karma {
+    background: linear-gradient(90deg, #aa4b6b, #6b6b83, #3b8d99);
+}
+
+.fill-fame {
+    background: linear-gradient(90deg, #ffd700, #ffaa00);
 }
