@@ -1,13 +1,24 @@
 import React, { useState } from 'react';
 
 export function RelationshipsMenu({ person, onInteract, onClose }) {
-    const [selectedRel, setSelectedRel] = useState(null);
+    // Store ID instead of object to ensuring we always render fresh data from props
+    const [selectedRelId, setSelectedRelId] = useState(null);
+
+    // Derive selected relationship from current person prop
+    const selectedRel = selectedRelId
+        ? person.relationships.find(r => r.id === selectedRelId)
+        : null;
+
+    // If selected relationship is gone (e.g. died/removed), reset selection
+    if (selectedRelId && !selectedRel) {
+        setSelectedRelId(null);
+    }
 
     const itemDisabled = (minAge) => person.age < minAge;
 
     const StatBar = ({ value, color }) => (
-        <div style={{ height: '6px', backgroundColor: '#e0e0e0', borderRadius: '3px', marginTop: '4px', overflow: 'hidden' }}>
-            <div style={{ width: `${value}%`, height: '100%', backgroundColor: color }} />
+        <div style={{ height: '6px', backgroundColor: '#333', borderRadius: '3px', marginTop: '4px', overflow: 'hidden' }}>
+            <div style={{ width: `${value}%`, height: '100%', backgroundColor: color, transition: 'width 0.3s ease' }} />
         </div>
     );
 
@@ -15,57 +26,75 @@ export function RelationshipsMenu({ person, onInteract, onClose }) {
         <div className="relationships-menu animate-fade-in" style={{
             position: 'absolute',
             top: 0, left: 0, right: 0, bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.8)',
+            backgroundColor: 'rgba(0,0,0,0.85)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             padding: '20px',
-            zIndex: 100
+            zIndex: 100,
+            color: '#fff'
         }}>
             <div className="animate-slide-up" style={{
-                backgroundColor: 'white',
+                backgroundColor: '#1f1f1f',
                 borderRadius: '12px',
                 width: '100%',
                 maxHeight: '80%',
                 overflowY: 'auto',
-                padding: '20px'
+                padding: '20px',
+                border: '1px solid #333',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.5)'
             }}>
-                <div className="flex justify-between items-center" style={{ marginBottom: '16px' }}>
-                    <h2 style={{ margin: 0 }}>Relationships</h2>
-                    <button onClick={onClose} style={{ padding: '8px', background: '#eee' }}>X</button>
+                <div className="flex justify-between items-center" style={{ marginBottom: '16px', borderBottom: '1px solid #333', paddingBottom: '10px' }}>
+                    <h2 style={{ margin: 0, color: '#fff' }}>Relationships</h2>
+                    <button onClick={onClose} style={{
+                        padding: '8px 12px',
+                        background: '#333',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer'
+                    }}>X</button>
                 </div>
 
                 {selectedRel ? (
                     <div className="rel-detail">
                         <button
-                            onClick={() => setSelectedRel(null)}
-                            style={{ marginBottom: '16px', padding: '8px 16px' }}
+                            onClick={() => setSelectedRelId(null)}
+                            style={{
+                                marginBottom: '16px',
+                                padding: '8px 16px',
+                                background: 'transparent',
+                                border: '1px solid #555',
+                                color: '#ccc',
+                                borderRadius: '4px',
+                                cursor: 'pointer'
+                            }}
                         >
                             &larr; Back
                         </button>
 
-                        <h3 className="text-center">{selectedRel.name} ({selectedRel.type})</h3>
-                        <div style={{ margin: '16px 0', textAlign: 'center' }}>
-                            Relationship: {selectedRel.stat}%
-                            <StatBar value={selectedRel.stat} color={selectedRel.stat > 50 ? '#4caf50' : '#f44336'} />
+                        <h3 className="text-center" style={{ color: '#fff' }}>{selectedRel.name} <span style={{ color: '#888', fontSize: '0.8em' }}>({selectedRel.type})</span></h3>
+                        <div style={{ margin: '16px 0', textAlign: 'center', background: '#252525', padding: '15px', borderRadius: '8px' }}>
+                            <div style={{ marginBottom: '5px' }}>Relationship: <span style={{ fontWeight: 'bold' }}>{selectedRel.stat}%</span></div>
+                            <StatBar value={selectedRel.stat} color={selectedRel.stat > 50 ? '#4caf50' : '#ef5350'} />
                         </div>
 
                         <div style={{ display: 'grid', gap: '10px' }}>
                             <button
                                 onClick={() => onInteract(selectedRel.id, 'spend_time')}
-                                style={{ padding: '12px', backgroundColor: '#e3f2fd' }}
+                                style={{ padding: '12px', backgroundColor: '#1565c0', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
                             >
                                 Spend Time
                             </button>
                             <button
                                 onClick={() => onInteract(selectedRel.id, 'compliment')}
-                                style={{ padding: '12px', backgroundColor: '#e8f5e9' }}
+                                style={{ padding: '12px', backgroundColor: '#2e7d32', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
                             >
                                 Compliment
                             </button>
                             <button
                                 onClick={() => onInteract(selectedRel.id, 'insult')}
-                                style={{ padding: '12px', backgroundColor: '#ffebee', color: '#c62828' }}
+                                style={{ padding: '12px', backgroundColor: '#c62828', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
                             >
                                 Insult
                             </button>
@@ -82,9 +111,10 @@ export function RelationshipsMenu({ person, onInteract, onClose }) {
                                         }}
                                         style={{
                                             padding: '12px',
-                                            backgroundColor: itemDisabled(16) ? '#f5f5f5' : '#fce4ec',
-                                            color: itemDisabled(16) ? '#888' : '#880e4f',
-                                            cursor: itemDisabled(16) ? 'not-allowed' : 'pointer'
+                                            backgroundColor: itemDisabled(16) ? '#333' : '#ad1457',
+                                            color: itemDisabled(16) ? '#666' : 'white',
+                                            cursor: itemDisabled(16) ? 'not-allowed' : 'pointer',
+                                            border: 'none', borderRadius: '4px'
                                         }}
                                         disabled={itemDisabled(16)}
                                     >
@@ -101,9 +131,10 @@ export function RelationshipsMenu({ person, onInteract, onClose }) {
                                             }}
                                             style={{
                                                 padding: '12px',
-                                                backgroundColor: itemDisabled(18) ? '#f5f5f5' : '#fff8e1',
-                                                color: itemDisabled(18) ? '#888' : '#ff6f00',
-                                                cursor: itemDisabled(18) ? 'not-allowed' : 'pointer'
+                                                backgroundColor: itemDisabled(18) ? '#333' : '#f57f17',
+                                                color: itemDisabled(18) ? '#666' : 'white',
+                                                cursor: itemDisabled(18) ? 'not-allowed' : 'pointer',
+                                                border: 'none', borderRadius: '4px'
                                             }}
                                             disabled={itemDisabled(18)}
                                         >
@@ -115,9 +146,10 @@ export function RelationshipsMenu({ person, onInteract, onClose }) {
                                             onClick={() => onInteract(selectedRel.id, 'marry')}
                                             style={{
                                                 padding: '12px',
-                                                backgroundColor: '#fff3e0',
-                                                color: '#e65100',
-                                                cursor: 'pointer'
+                                                backgroundColor: '#ef6c00',
+                                                color: 'white',
+                                                cursor: 'pointer',
+                                                border: 'none', borderRadius: '4px'
                                             }}
                                         >
                                             💍 Plan Wedding ($5,000)
@@ -129,18 +161,21 @@ export function RelationshipsMenu({ person, onInteract, onClose }) {
                                             if (selectedRel.type === 'Spouse') {
                                                 if (confirm("Are you sure you want to divorce? You will lose half your money.")) {
                                                     onInteract(selectedRel.id, 'divorce');
-                                                    setSelectedRel(null);
+                                                    setSelectedRelId(null);
                                                 }
                                             } else {
                                                 onInteract(selectedRel.id, 'break_up');
-                                                setSelectedRel(null);
+                                                setSelectedRelId(null);
                                             }
                                         }}
                                         style={{
                                             padding: '12px',
-                                            backgroundColor: '#ffebee',
-                                            color: '#c62828',
-                                            marginTop: '10px'
+                                            backgroundColor: '#333',
+                                            border: '1px solid #c62828',
+                                            color: '#ef5350',
+                                            marginTop: '10px',
+                                            borderRadius: '4px',
+                                            cursor: 'pointer'
                                         }}
                                     >
                                         {selectedRel.type === 'Spouse' ? '💔 Divorce' : '💔 Break Up'}
@@ -151,22 +186,31 @@ export function RelationshipsMenu({ person, onInteract, onClose }) {
                     </div>
                 ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                        {person.relationships.length === 0 ? <p className="text-center">You have no relationships.</p> :
+                        {person.relationships.length === 0 ? <p className="text-center" style={{ color: '#888' }}>You have no relationships.</p> :
                             person.relationships.map(rel => (
                                 <button
                                     key={rel.id}
-                                    onClick={() => setSelectedRel(rel)}
+                                    onClick={() => setSelectedRelId(rel.id)}
                                     style={{
                                         textAlign: 'left',
-                                        padding: '12px',
-                                        border: '1px solid #ddd',
+                                        padding: '15px',
+                                        border: '1px solid #333',
                                         borderRadius: '8px',
-                                        backgroundColor: 'white'
+                                        backgroundColor: '#252525',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '5px',
+                                        cursor: 'pointer',
+                                        transition: 'background 0.2s'
                                     }}
+                                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#303030'}
+                                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#252525'}
                                 >
-                                    <div className="bold">{rel.name}</div>
-                                    <div style={{ fontSize: '0.9em', color: '#666' }}>{rel.type}</div>
-                                    <StatBar value={rel.stat} color={rel.stat > 50 ? '#4caf50' : '#f44336'} />
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <div className="bold" style={{ color: '#fff', fontSize: '1.1em' }}>{rel.name}</div>
+                                        <div style={{ fontSize: '0.9em', color: '#aaa' }}>{rel.type}</div>
+                                    </div>
+                                    <StatBar value={rel.stat} color={rel.stat > 50 ? '#4caf50' : '#ef5350'} />
                                 </button>
                             ))}
                     </div>
